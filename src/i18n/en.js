@@ -22,9 +22,12 @@ export const en = {
   },
   hero: {
     eyebrow: "Interactive Lesson",
-    title: (rowId) => `Build a tiny decision tree for row ${rowId}`,
+    title: (rowId) => `Build a tiny decision tree`,
     copy:
-      "Edit binary rules with size and neighborhood, route every housing row into a leaf, and watch how the prediction changes."
+      "Edit binary rules with size and neighborhood, route every housing row into a leaf, and watch how the prediction changes.",
+    qrAlt: "QR code for the live demo",
+    qrButtonLabel: "Open QR code",
+    qrDialogLabel: "QR code modal"
   },
   controls: {
     reset: "Reset Tree",

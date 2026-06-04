@@ -24,7 +24,10 @@ export const es = {
     eyebrow: "Lección interactiva",
     title: (rowId) => `Construye un árbol de decisión pequeño`,
     copy:
-      "Edita reglas binarias con tamaño y barrio, lleva cada fila de vivienda a una hoja y observa cómo cambia la predicción."
+      "Edita reglas binarias con tamaño y barrio, lleva cada fila de vivienda a una hoja y observa cómo cambia la predicción.",
+    qrAlt: "Código QR para la demo en vivo",
+    qrButtonLabel: "Abrir código QR",
+    qrDialogLabel: "Modal del código QR"
   },
   controls: {
     reset: "Reiniciar árbol",

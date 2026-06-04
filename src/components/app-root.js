@@ -14,6 +14,9 @@ import "./control-bar.js";
 import "./dataset-table.js";
 import "./tree-editor.js";
 
+const QR_CODE_URL =
+  "https://quickchart.io/qr?text=https%3A%2F%2Fciberado.github.io%2Ffun-ml-decision-trees%2F&size=400";
+
 const EVENT_NAMES = [
   "locale-change",
   "row-select",
@@ -30,7 +33,10 @@ class AppRoot extends HTMLElement {
     super();
     this.state = createInitialState();
     this.notice = "";
+    this.isQrModalOpen = false;
     this.handleEvent = this.handleEvent.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+    this.handleKeydown = this.handleKeydown.bind(this);
   }
 
   connectedCallback() {
@@ -38,6 +44,8 @@ class AppRoot extends HTMLElement {
       this.addEventListener(eventName, this.handleEvent);
     }
 
+    this.addEventListener("click", this.handleClick);
+    window.addEventListener("keydown", this.handleKeydown);
     this.render();
   }
 
@@ -45,6 +53,9 @@ class AppRoot extends HTMLElement {
     for (const eventName of EVENT_NAMES) {
       this.removeEventListener(eventName, this.handleEvent);
     }
+
+    this.removeEventListener("click", this.handleClick);
+    window.removeEventListener("keydown", this.handleKeydown);
   }
 
   updateControlBar(state) {
@@ -53,6 +64,31 @@ class AppRoot extends HTMLElement {
     if (controlBar) {
       controlBar.state = state;
     }
+  }
+
+  handleClick(event) {
+    const qrToggle = event.target.closest("[data-qr-toggle]");
+    const qrClose = event.target.closest("[data-qr-close]");
+
+    if (qrToggle) {
+      this.isQrModalOpen = true;
+      this.render();
+      return;
+    }
+
+    if (this.isQrModalOpen && qrClose) {
+      this.isQrModalOpen = false;
+      this.render();
+    }
+  }
+
+  handleKeydown() {
+    if (!this.isQrModalOpen) {
+      return;
+    }
+
+    this.isQrModalOpen = false;
+    this.render();
   }
 
   handleEvent(event) {
@@ -108,8 +144,21 @@ class AppRoot extends HTMLElement {
     this.innerHTML = `
       <div class="page-shell">
         <header class="hero">
-          <p class="eyebrow">${messages.hero.eyebrow}</p>
-          <h1>${messages.hero.title(targetRowId)}</h1>
+          <div class="hero-head">
+            <div class="hero-title-block">
+              <p class="eyebrow">${messages.hero.eyebrow}</p>
+              <h1>${messages.hero.title(targetRowId)}</h1>
+            </div>
+            <button
+              type="button"
+              class="hero-qr-button"
+              data-qr-toggle
+              aria-label="${messages.hero.qrButtonLabel}"
+              title="${messages.hero.qrButtonLabel}"
+            >
+              <img class="hero-qr-image" src="${QR_CODE_URL}" alt="${messages.hero.qrAlt}">
+            </button>
+          </div>
           <p class="hero-copy">${messages.hero.copy}</p>
         </header>
 
@@ -126,6 +175,24 @@ class AppRoot extends HTMLElement {
             <tree-editor></tree-editor>
           </section>
         </main>
+
+        ${
+          this.isQrModalOpen
+            ? `
+              <div class="modal-overlay" data-qr-close role="presentation">
+                <div
+                  class="modal-card modal-card-image"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="${messages.hero.qrDialogLabel}"
+                  data-qr-close
+                >
+                  <img class="modal-qr-image" src="${QR_CODE_URL}" alt="${messages.hero.qrAlt}" data-qr-close>
+                </div>
+              </div>
+            `
+            : ""
+        }
       </div>
     `;
 

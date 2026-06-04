@@ -24,7 +24,10 @@ export const ca = {
     eyebrow: "Lliçó interactiva",
     title: (rowId) => `Construeix un arbre de decisió petit`,
     copy:
-      "Edita regles binàries amb mida i barri, envia cada fila d'habitatge a una fulla i observa com canvia la predicció."
+      "Edita regles binàries amb mida i barri, envia cada fila d'habitatge a una fulla i observa com canvia la predicció.",
+    qrAlt: "Codi QR per a la demo en viu",
+    qrButtonLabel: "Obre el codi QR",
+    qrDialogLabel: "Modal del codi QR"
   },
   controls: {
     reset: "Reinicia l'arbre",
