@@ -53,7 +53,7 @@ The design is successful if a first-time user can:
 ## Dataset
 This dataset is intentionally artificial. It is designed for pedagogy, not realism.
 
-For the lesson, `Price` is the known real-world outcome for rows `1` through `7`. The tree predicts a derived class:
+For the lesson, `Price` is the known real-world outcome for rows `2` through `15`. The tree predicts a derived class:
 
 - `Budget`: `price <= 250`
 - `Premium`: `price > 250`
@@ -68,6 +68,13 @@ For the lesson, `Price` is the known real-world outcome for rows `1` through `7`
 | 6 | 340 | Premium | 110 | B | 3.09 | Premium flat in B |
 | 7 | 230 | Budget | 70 | B | 3.29 | Small budget exception in B |
 | 8 | 380 | Premium | 130 | B | 2.92 | Larger premium flat in B |
+| 9 | 210 | Budget | 95 | A | 2.21 | Medium budget flat in A |
+| 10 | 240 | Budget | 125 | A | 1.92 | Larger budget flat in A |
+| 11 | 290 | Premium | 85 | A | 3.41 | Another small premium flat in A |
+| 12 | 320 | Premium | 100 | B | 3.20 | Mid-size premium flat in B |
+| 13 | 410 | Premium | 145 | B | 2.83 | Large premium flat in B |
+| 14 | 240 | Budget | 75 | B | 3.20 | Small budget exception in B |
+| 15 | 245 | Budget | 80 | B | 3.06 | Edge-case budget flat in B |
 
 ### Why This Dataset Works
 - Neighborhood is a stronger signal than size on its own.
@@ -82,7 +89,7 @@ For the lesson, `Price` is the known real-world outcome for rows `1` through `7`
 The app teaches classification, not regression.
 
 - Input features for the tree: `size`, `neighborhood`
-- Known labels for rows `2` through `8`: `Budget`, `Premium`
+- Known labels for rows `2` through `15`: `Budget`, `Premium`
 - Unknown target: row `1` in the current fixture
 - Positive class for evaluation: `Premium`
 
@@ -96,7 +103,7 @@ The app should feel like an interactive lesson and a constrained tree editor at 
 4. The app recomputes the routing immediately.
 5. Balls move or relocate into the corresponding leaf buckets.
 6. The app shows the predicted class for the target row.
-7. The app evaluates the current tree on rows `1` through `7`.
+7. The app evaluates the current tree on the known rows.
 8. The app warns if the current tree performs worse than the starter tree baseline.
 
 ### Interaction Principles
@@ -200,15 +207,15 @@ Each leaf predicts a class using majority vote over the known rows it contains.
 - if there is a tie, predict the global majority class of the training rows
 - if a leaf contains no known rows, predict the global majority class of the training rows
 
-For the provided dataset, the global majority is `Budget` because rows `1` through `7` contain:
+For the provided dataset, the global majority is `Budget` because the known rows contain:
 
-- `Budget`: `4`
-- `Premium`: `3`
+- `Budget`: `8`
+- `Premium`: `6`
 
 The UI should surface when a global-majority fallback was used, whether due to a tie or an empty leaf.
 
 ### Evaluation
-- The app must evaluate the current tree on rows `1` through `7`.
+- The app must evaluate the current tree on the known rows.
 - The app must display:
   - accuracy
   - false positives
@@ -370,7 +377,14 @@ Suggested app state:
     { id: 5, price: 300, label: "Premium", size: 70, neighborhood: "A" },
     { id: 6, price: 340, label: "Premium", size: 110, neighborhood: "B" },
     { id: 7, price: 230, label: "Budget", size: 70, neighborhood: "B" },
-    { id: 8, price: 380, label: "Premium", size: 130, neighborhood: "B" }
+    { id: 8, price: 380, label: "Premium", size: 130, neighborhood: "B" },
+    { id: 9, price: 210, label: "Budget", size: 95, neighborhood: "A" },
+    { id: 10, price: 240, label: "Budget", size: 125, neighborhood: "A" },
+    { id: 11, price: 290, label: "Premium", size: 85, neighborhood: "A" },
+    { id: 12, price: 320, label: "Premium", size: 100, neighborhood: "B" },
+    { id: 13, price: 410, label: "Premium", size: 145, neighborhood: "B" },
+    { id: 14, price: 240, label: "Budget", size: 75, neighborhood: "B" },
+    { id: 15, price: 245, label: "Budget", size: 80, neighborhood: "B" }
   ],
   baselineTree: { ... },
   tree: { ... },
@@ -521,7 +535,7 @@ The first version should include:
 - visible leaf buckets
 - predicted class for the target row
 - structured path explanation for the target row
-- evaluation metrics for rows `1` through `7`
+- evaluation metrics for the known rows
 - warning when the edited tree performs worse than the starter tree
 - stateless behavior across refreshes
 

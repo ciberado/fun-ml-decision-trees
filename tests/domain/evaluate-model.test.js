@@ -16,8 +16,8 @@ test("starter tree produces the documented baseline metrics", () => {
   });
 
   assert.equal(state.prediction.predictedLabel, "Budget");
-  assert.equal(state.evaluation.correctRows.length, 6);
-  assert.equal(state.evaluation.accuracy, 6 / 7);
+  assert.equal(state.evaluation.correctRows.length, 12);
+  assert.equal(state.evaluation.accuracy, 12 / 14);
   assert.deepEqual(state.evaluation.falsePositives, []);
-  assert.deepEqual(state.evaluation.falseNegatives, [5]);
+  assert.deepEqual(state.evaluation.falseNegatives, [5, 11]);
 });

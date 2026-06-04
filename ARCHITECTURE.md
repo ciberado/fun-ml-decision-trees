@@ -211,7 +211,7 @@ After any valid tree edit:
 2. route all rows
 3. classify leaves
 4. predict the target row
-5. evaluate rows `1` through `7`
+5. evaluate the known rows
 6. compare current metrics to baseline
 7. trigger UI update
 
@@ -285,7 +285,7 @@ The editor must enforce:
 ## Evaluation Rules
 - Positive class is `Premium`.
 - Leaf label is assigned by majority vote.
-- Tie-break uses the global majority class from rows `1` through `7`.
+- Tie-break uses the global majority class from the known rows.
 - Baseline comparison checks:
   - accuracy
   - false positives

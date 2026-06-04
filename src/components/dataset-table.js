@@ -35,8 +35,7 @@ class DatasetTable extends HTMLElement {
       return;
     }
 
-    const { dataset, selectedRow, prediction } = this._state;
-    const activeRow = dataset.find((row) => row.id === selectedRow.rowId);
+    const { dataset, selectedRow } = this._state;
 
     this.innerHTML = `
       <section class="subpanel">
@@ -87,21 +86,6 @@ class DatasetTable extends HTMLElement {
             </tbody>
           </table>
         </div>
-
-        <section class="detail-card">
-          <p class="eyebrow">Selected Row</p>
-          <h3>Row ${activeRow.id}${activeRow.isTarget ? " (target row)" : ""}</h3>
-          <p class="detail-copy">
-            Path: ${selectedRow.pathSummary.join(" -> ")}
-          </p>
-          <p class="detail-copy">
-            Leaf prediction: <strong>${selectedRow.leafPrediction}</strong>
-          </p>
-          <p class="detail-copy">
-            Row ${prediction.targetRowId} currently lands in <strong>${prediction.predictedLeafId}</strong> and is predicted as
-            <strong>${prediction.predictedLabel}</strong>.
-          </p>
-        </section>
       </section>
     `;
   }

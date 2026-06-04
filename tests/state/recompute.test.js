@@ -18,7 +18,7 @@ test("editing a split recomputes evaluation warnings", () => {
   });
 
   assert.equal(nextState.prediction.predictedLabel, "Premium");
-  assert.equal(nextState.evaluation.accuracy, 5 / 7);
+  assert.equal(nextState.evaluation.accuracy, 9 / 14);
   assert.equal(nextState.evaluation.hasAccuracyWarning, true);
   assert.equal(nextState.evaluation.hasFalsePositiveWarning, true);
   assert.equal(nextState.evaluation.hasFalseNegativeWarning, false);
@@ -40,12 +40,12 @@ test("removing a split collapses the subtree and reset restores the starter tree
   const collapsedState = removeSplitNode(initialState, "root");
 
   assert.equal(collapsedState.tree.type, "leaf");
-  assert.equal(collapsedState.evaluation.accuracy, 4 / 7);
+  assert.equal(collapsedState.evaluation.accuracy, 8 / 14);
 
   const restoredState = resetTree(collapsedState);
   assert.equal(restoredState.tree.type, "split");
   assert.equal(restoredState.tree.id, "root");
-  assert.equal(restoredState.evaluation.accuracy, 6 / 7);
+  assert.equal(restoredState.evaluation.accuracy, 12 / 14);
 });
 
 test("playing a split moves one ball at a time and condition edits redistribute processed rows", () => {
@@ -53,7 +53,7 @@ test("playing a split moves one ball at a time and condition edits redistribute 
   const afterOnePlay = playSplitNode(withSplit, "root");
 
   assert.equal(afterOnePlay.editor.nodesById.root.processedCount, 1);
-  assert.deepEqual(afterOnePlay.editor.nodesById.root.remainingRowIds, [2, 3, 4, 5, 6, 7, 8]);
+  assert.deepEqual(afterOnePlay.editor.nodesById.root.remainingRowIds, [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
   assert.deepEqual(afterOnePlay.editor.nodesById[afterOnePlay.tree.trueBranch.id].rowIds, [1]);
   assert.deepEqual(afterOnePlay.editor.nodesById[afterOnePlay.tree.falseBranch.id].rowIds, []);
 
@@ -63,7 +63,7 @@ test("playing a split moves one ball at a time and condition edits redistribute 
   });
 
   assert.equal(redistributed.editor.nodesById.root.processedCount, 1);
-  assert.deepEqual(redistributed.editor.nodesById.root.remainingRowIds, [2, 3, 4, 5, 6, 7, 8]);
+  assert.deepEqual(redistributed.editor.nodesById.root.remainingRowIds, [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
   assert.deepEqual(redistributed.editor.nodesById[redistributed.tree.trueBranch.id].rowIds, []);
   assert.deepEqual(redistributed.editor.nodesById[redistributed.tree.falseBranch.id].rowIds, [1]);
 });
@@ -80,6 +80,6 @@ test("leaf buckets get a class marker only after upstream processing is complete
 
   assert.equal(state.editor.nodesById.root.canPlay, false);
   assert.equal(state.editor.nodesById[state.tree.trueBranch.id].isSettled, true);
-  assert.equal(state.editor.nodesById[state.tree.trueBranch.id].majorityLabel, null);
-  assert.equal(state.editor.nodesById[state.tree.falseBranch.id].majorityLabel, "Budget");
+  assert.equal(state.editor.nodesById[state.tree.trueBranch.id].majorityLabel, "Budget");
+  assert.equal(state.editor.nodesById[state.tree.falseBranch.id].majorityLabel, null);
 });
