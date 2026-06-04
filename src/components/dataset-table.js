@@ -9,16 +9,19 @@ class DatasetTable extends HTMLElement {
   connectedCallback() {
     this.addEventListener("click", (event) => {
       const rowButton = event.target.closest("[data-row-select]");
+      const rowElement = event.target.closest("[data-row-id]");
 
-      if (!rowButton) {
+      if (!rowButton && !rowElement) {
         return;
       }
+
+      const rowId = Number(rowButton?.dataset.rowSelect ?? rowElement?.dataset.rowId);
 
       this.dispatchEvent(
         new CustomEvent("row-select", {
           bubbles: true,
           detail: {
-            rowId: Number(rowButton.dataset.rowSelect)
+            rowId
           }
         })
       );
@@ -51,7 +54,7 @@ class DatasetTable extends HTMLElement {
                 <th scope="col">Price</th>
                 <th scope="col">Class</th>
                 <th scope="col">Size</th>
-                <th scope="col">N.</th>
+                <th scope="col">Neighborhood</th>
                 <th scope="col">€/m2</th>
               </tr>
             </thead>
@@ -66,7 +69,7 @@ class DatasetTable extends HTMLElement {
                     .join(" ");
 
                   return `
-                    <tr class="${rowClass}">
+                    <tr class="${rowClass}" data-row-id="${row.id}">
                       <td>
                         <button type="button" class="row-select-button" data-row-select="${row.id}">
                           ${row.id}
