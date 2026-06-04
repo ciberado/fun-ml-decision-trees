@@ -2,6 +2,35 @@ import { FEATURE_CONFIG, FEATURE_OPTIONS } from "../domain/config.js";
 import { buildEditorFlow } from "../state/recompute.js";
 import "./row-ball-layer.js";
 
+function invertOperator(operator) {
+  if (operator === "<=") {
+    return ">";
+  }
+
+  if (operator === ">") {
+    return "<=";
+  }
+
+  if (operator === "=") {
+    return "!=";
+  }
+
+  return "=";
+}
+
+function formatConditionText(condition, negate = false) {
+  const operator = negate ? invertOperator(condition.operator) : condition.operator;
+  return `${condition.feature} ${operator} ${condition.value}`;
+}
+
+function appendBucketLabel(prefix, conditionText) {
+  if (!prefix || prefix === "All rows") {
+    return conditionText;
+  }
+
+  return `${prefix} · ${conditionText}`;
+}
+
 function renderOperatorOptions(featureName, currentOperator) {
   return FEATURE_CONFIG[featureName].operators
     .map(
@@ -37,7 +66,6 @@ function renderValueControl(nodeId, condition, dataset) {
     const range = getNumericRange(dataset, condition.feature);
     return `
       <label class="field range-field">
-        <span>Value</span>
         <div class="range-control">
           <input
             class="field-input range-input"
@@ -57,11 +85,10 @@ function renderValueControl(nodeId, condition, dataset) {
   }
 
   return `
-    <label class="field">
-      <span>Value</span>
-      <select class="field-input" data-node-id="${nodeId}" data-condition-field="value">
-        ${feature.options
-          .map(
+      <label class="field">
+        <select class="field-input" data-node-id="${nodeId}" data-condition-field="value">
+          ${feature.options
+            .map(
             (option) =>
               `<option value="${option}" ${option === condition.value ? "selected" : ""}>${option}</option>`
           )
@@ -168,7 +195,7 @@ class TreeNode extends HTMLElement {
       return;
     }
 
-    const { flow, treeNode, dataset, selectedRowId, selectedLeafId } = this._data;
+    const { flow, treeNode, dataset, bucketLabel, selectedRowId, selectedLeafId } = this._data;
     const isSelectedLeaf = flow.type === "leaf" && flow.nodeId === selectedLeafId;
     const leafBadge =
       flow.type === "leaf" && flow.isSettled && flow.majorityLabel
@@ -187,24 +214,10 @@ class TreeNode extends HTMLElement {
         <div class="${sourceCardClasses}">
           <div class="stage-source-main">
             <div class="stage-source-copy">
-              <p class="eyebrow">${flow.type === "split" ? `Split ${treeNode.id}` : `Bucket ${treeNode.id}`}</p>
               <h3>
-                ${flow.type === "split" ? "Unprocessed balls" : "Waiting bucket"}
+                ${bucketLabel}
                 ${leafBadge}
               </h3>
-              <p class="stage-meta">
-                ${
-                  flow.type === "split"
-                    ? `${flow.processedCount} processed, ${flow.remainingRowIds.length} still waiting`
-                    : `${
-                        flow.rowIds.length
-                      } balls in this bucket${
-                        flow.isSettled && flow.majorityLabel
-                          ? ` | Budget ${flow.majorityCounts.Budget} | Premium ${flow.majorityCounts.Premium}`
-                          : ""
-                      }`
-                }
-              </p>
             </div>
             <div class="stage-source-actions">
               <button
@@ -233,19 +246,8 @@ class TreeNode extends HTMLElement {
           flow.type === "split"
             ? `
               <div class="stage-split-card">
-                <div class="node-head">
-                  <div>
-                    <p class="eyebrow">Split Rule</p>
-                    <h3>Current condition</h3>
-                  </div>
-                  <button type="button" class="mini-action danger" data-remove-split="${treeNode.id}">
-                    Remove Split
-                  </button>
-                </div>
-
-                <div class="field-grid stage-field-grid">
-                  <label class="field">
-                    <span>Feature</span>
+                <div class="compact-split-row">
+                  <label class="field compact-field">
                     <select class="field-input" data-node-id="${treeNode.id}" data-condition-field="feature">
                       ${FEATURE_OPTIONS.map(
                         (feature) =>
@@ -256,24 +258,25 @@ class TreeNode extends HTMLElement {
                     </select>
                   </label>
 
-                  <label class="field">
-                    <span>Operator</span>
+                  <label class="field compact-field">
                     <select class="field-input" data-node-id="${treeNode.id}" data-condition-field="operator">
                       ${renderOperatorOptions(treeNode.condition.feature, treeNode.condition.operator)}
                     </select>
                   </label>
 
                   ${renderValueControl(treeNode.id, treeNode.condition, dataset)}
+
+                  <button type="button" class="mini-action danger compact-remove" data-remove-split="${treeNode.id}">
+                    Remove
+                  </button>
                 </div>
               </div>
 
               <div class="stage-branch-grid">
                 <section class="stage-branch">
-                  <p class="branch-label">False bucket</p>
                   <tree-node data-branch="false"></tree-node>
                 </section>
                 <section class="stage-branch">
-                  <p class="branch-label">True bucket</p>
                   <tree-node data-branch="true"></tree-node>
                 </section>
               </div>
@@ -291,17 +294,8 @@ class TreeNode extends HTMLElement {
     sourceLayer.selectedRowId = selectedRowId;
 
     if (flow.type === "split") {
-      this.querySelector('[data-branch="true"]').data = {
-        ...this._data,
-        flow: flow.trueBranch,
-        treeNode: treeNode.trueBranch
-      };
-
-      this.querySelector('[data-branch="false"]').data = {
-        ...this._data,
-        flow: flow.falseBranch,
-        treeNode: treeNode.falseBranch
-      };
+      this.querySelector('[data-branch="true"]').data = this.renderChildData("true");
+      this.querySelector('[data-branch="false"]').data = this.renderChildData("false");
     }
   }
 
@@ -331,10 +325,6 @@ class TreeNode extends HTMLElement {
 
     const sourceMeta = this.querySelector(".stage-meta");
 
-    if (sourceMeta) {
-      sourceMeta.textContent = `${previewFlow.processedCount} processed, ${previewFlow.remainingRowIds.length} still waiting`;
-    }
-
     const trueBranch = this.querySelector('[data-branch="true"]');
     const falseBranch = this.querySelector('[data-branch="false"]');
 
@@ -342,7 +332,11 @@ class TreeNode extends HTMLElement {
       trueBranch.data = {
         ...this._data,
         flow: previewFlow.trueBranch,
-        treeNode: previewNode.trueBranch
+        treeNode: previewNode.trueBranch,
+        bucketLabel: appendBucketLabel(
+          this._data.bucketLabel,
+          formatConditionText(previewNode.condition)
+        )
       };
     }
 
@@ -350,9 +344,30 @@ class TreeNode extends HTMLElement {
       falseBranch.data = {
         ...this._data,
         flow: previewFlow.falseBranch,
-        treeNode: previewNode.falseBranch
+        treeNode: previewNode.falseBranch,
+        bucketLabel: appendBucketLabel(
+          this._data.bucketLabel,
+          formatConditionText(previewNode.condition, true)
+        )
       };
     }
+  }
+
+  renderChildData(branchKey) {
+    const isTrueBranch = branchKey === "true";
+    const nextFlow = isTrueBranch ? this._data.flow.trueBranch : this._data.flow.falseBranch;
+    const nextTreeNode = isTrueBranch ? this._data.treeNode.trueBranch : this._data.treeNode.falseBranch;
+    const nextLabel = appendBucketLabel(
+      this._data.bucketLabel,
+      formatConditionText(this._data.treeNode.condition, !isTrueBranch)
+    );
+
+    return {
+      ...this._data,
+      flow: nextFlow,
+      treeNode: nextTreeNode,
+      bucketLabel: nextLabel
+    };
   }
 }
 

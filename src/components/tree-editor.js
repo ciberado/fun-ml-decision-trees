@@ -29,6 +29,7 @@ class TreeEditor extends HTMLElement {
       treeNode: this._state.tree,
       dataset: this._state.dataset,
       splitProgress: this._state.ui.splitProgress,
+      bucketLabel: "All rows",
       selectedRowId: this._state.selectedRow.rowId,
       selectedLeafId: this._state.selectedRow.leafId
     };

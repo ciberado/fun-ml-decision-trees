@@ -317,7 +317,7 @@ select {
 }
 
 .stage-source-card {
-  padding: 16px;
+  padding: 12px;
 }
 
 .stage-source-card.contains-target {
@@ -332,29 +332,35 @@ select {
 .stage-source-main {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
-  align-items: flex-start;
-  margin-bottom: 14px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 .stage-source-copy {
   display: grid;
-  gap: 4px;
+  min-width: 0;
+}
+
+.stage-source-copy h3 {
+  font-size: 1rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .stage-source-actions {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: stretch;
+  gap: 6px;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .stage-icon-button,
 .stage-play-button {
   min-width: 3rem;
-  padding: 8px 10px;
+  padding: 6px 10px;
   border: 1px solid rgba(121, 96, 52, 0.18);
-  border-radius: 12px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.86);
   color: var(--ink);
   cursor: pointer;
@@ -375,19 +381,13 @@ select {
   cursor: not-allowed;
 }
 
-.stage-meta {
-  margin: 0;
-  color: var(--muted);
-  line-height: 1.4;
-}
-
 .leaf-result-badge {
   display: inline-flex;
   align-items: center;
-  margin-left: 10px;
-  padding: 4px 10px;
+  margin-left: 8px;
+  padding: 3px 8px;
   border-radius: 999px;
-  font-size: 0.82rem;
+  font-size: 0.75rem;
   font-weight: 700;
   vertical-align: middle;
 }
@@ -403,16 +403,24 @@ select {
 }
 
 .stage-split-card {
-  margin-top: 12px;
-  padding: 16px;
+  margin-top: 8px;
+  padding: 10px 12px;
 }
 
-.stage-field-grid {
-  margin-top: 14px;
+.compact-split-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(90px, auto) minmax(180px, 1.2fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.compact-field {
+  gap: 0;
 }
 
 .range-field {
   align-content: start;
+  gap: 0;
 }
 
 .range-control {
@@ -427,8 +435,8 @@ select {
 }
 
 .range-value {
-  min-width: 2.5rem;
-  font-size: 0.9rem;
+  min-width: 2rem;
+  font-size: 0.82rem;
   font-weight: 700;
   text-align: right;
   pointer-events: none;
@@ -438,13 +446,13 @@ select {
 .stage-branch-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 14px;
+  gap: 12px;
+  margin-top: 10px;
 }
 
 .stage-branch {
   position: relative;
-  padding-top: 18px;
+  padding-top: 10px;
 }
 
 .stage-branch::before {
@@ -485,10 +493,14 @@ select {
 
 .field-input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid rgba(121, 96, 52, 0.22);
-  border-radius: 14px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.82);
+}
+
+.compact-remove {
+  white-space: nowrap;
 }
 
 .branch-grid {
@@ -625,7 +637,11 @@ select {
   }
 
   .stage-source-actions {
-    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  .compact-split-row {
+    grid-template-columns: 1fr;
   }
 
   .hero,
