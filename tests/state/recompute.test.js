@@ -3,15 +3,21 @@ import assert from "node:assert/strict";
 import {
   addSplitAtLeaf,
   createInitialState,
+  forceRecompute,
   playSplitNode,
+  previewNodeCondition,
   removeSplitNode,
   resetTree,
   updateNodeCondition
 } from "../../src/state/app-state.js";
 
 test("editing a split recomputes evaluation warnings", () => {
-  const initialState = resetTree(createInitialState());
-  const nextState = updateNodeCondition(initialState, "split-size-b", {
+  const initialState = createInitialState();
+  const starterState = forceRecompute({
+    ...initialState,
+    tree: structuredClone(initialState.baselineTree)
+  });
+  const nextState = updateNodeCondition(starterState, "split-size-b", {
     feature: "neighborhood",
     operator: "=",
     value: "A"
@@ -22,6 +28,26 @@ test("editing a split recomputes evaluation warnings", () => {
   assert.equal(nextState.evaluation.hasAccuracyWarning, true);
   assert.equal(nextState.evaluation.hasFalsePositiveWarning, true);
   assert.equal(nextState.evaluation.hasFalseNegativeWarning, false);
+});
+
+test("previewing a split edit updates metrics without mutating the current tree", () => {
+  const initialState = createInitialState();
+  const starterState = forceRecompute({
+    ...initialState,
+    tree: structuredClone(initialState.baselineTree)
+  });
+  const previewState = previewNodeCondition(starterState, "split-size-b", {
+    feature: "neighborhood",
+    operator: "=",
+    value: "A"
+  });
+
+  assert.equal(starterState.tree.trueBranch.id, "split-size-b");
+  assert.equal(starterState.tree.trueBranch.condition.feature, "size");
+  assert.equal(previewState.tree.trueBranch.condition.feature, "neighborhood");
+  assert.equal(previewState.evaluation.accuracy, 9 / 14);
+  assert.deepEqual(previewState.evaluation.falsePositives, [7, 14, 15]);
+  assert.deepEqual(previewState.evaluation.falseNegatives, [5, 11]);
 });
 
 test("adding a split to a leaf creates new empty-leaf details", () => {
@@ -35,7 +61,7 @@ test("adding a split to a leaf creates new empty-leaf details", () => {
   assert.equal(nextState.editor.nodesById.root.processedCount, 0);
 });
 
-test("removing a split collapses the subtree and reset restores the starter tree", () => {
+test("removing a split collapses the subtree and reset clears back to the root leaf", () => {
   const initialState = addSplitAtLeaf(createInitialState(), "root");
   const collapsedState = removeSplitNode(initialState, "root");
 
@@ -43,9 +69,10 @@ test("removing a split collapses the subtree and reset restores the starter tree
   assert.equal(collapsedState.evaluation.accuracy, 8 / 14);
 
   const restoredState = resetTree(collapsedState);
-  assert.equal(restoredState.tree.type, "split");
+  assert.equal(restoredState.tree.type, "leaf");
   assert.equal(restoredState.tree.id, "root");
-  assert.equal(restoredState.evaluation.accuracy, 12 / 14);
+  assert.equal(restoredState.evaluation.accuracy, 8 / 14);
+  assert.deepEqual(restoredState.ui.splitProgress, {});
 });
 
 test("playing a split moves one ball at a time and condition edits redistribute processed rows", () => {

@@ -10,18 +10,12 @@ class ControlBar extends HTMLElement {
     this.addEventListener("click", (event) => {
       const action = event.target.closest("[data-action]")?.dataset.action;
 
-      if (!action) {
+      if (action !== "reset") {
         return;
       }
 
-      const eventMap = {
-        reset: "reset-tree",
-        recompute: "recompute-tree",
-        evaluation: "toggle-evaluation"
-      };
-
       this.dispatchEvent(
-        new CustomEvent(eventMap[action], {
+        new CustomEvent("reset-tree", {
           bubbles: true
         })
       );
@@ -35,16 +29,12 @@ class ControlBar extends HTMLElement {
       return;
     }
 
-    const { prediction, evaluation, ui } = this._state;
+    const { prediction, evaluation } = this._state;
 
     this.innerHTML = `
       <section class="control-strip">
         <div class="control-actions">
           <button type="button" class="action-button primary" data-action="reset">Reset To Starter Tree</button>
-          <button type="button" class="action-button" data-action="recompute">Recompute</button>
-          <button type="button" class="action-button" data-action="evaluation">
-            ${ui.showEvaluation ? "Hide" : "Show"} Evaluation
-          </button>
         </div>
         <div class="summary-pills" aria-label="Model summary">
           <span class="summary-pill">Row ${prediction.targetRowId}: <strong>${prediction.predictedLabel}</strong></span>

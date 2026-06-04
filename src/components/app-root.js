@@ -1,25 +1,21 @@
 import {
   addSplitAtLeaf,
   createInitialState,
-  forceRecompute,
   playSplitNode,
+  previewNodeCondition,
   removeSplitNode,
   resetTree,
   selectRow,
-  toggleEvaluation,
   updateNodeCondition
 } from "../state/app-state.js";
 import "./control-bar.js";
 import "./dataset-table.js";
 import "./tree-editor.js";
-import "./prediction-panel.js";
-import "./evaluation-panel.js";
 
 const EVENT_NAMES = [
   "row-select",
-  "toggle-evaluation",
   "reset-tree",
-  "recompute-tree",
+  "preview-condition",
   "condition-edit",
   "add-split",
   "play-node",
@@ -48,21 +44,30 @@ class AppRoot extends HTMLElement {
     }
   }
 
+  updateControlBar(state) {
+    const controlBar = this.querySelector("control-bar");
+
+    if (controlBar) {
+      controlBar.state = state;
+    }
+  }
+
   handleEvent(event) {
     try {
       switch (event.type) {
         case "row-select":
           this.state = selectRow(this.state, event.detail.rowId);
           break;
-        case "toggle-evaluation":
-          this.state = toggleEvaluation(this.state);
-          break;
         case "reset-tree":
           this.state = resetTree(this.state);
           break;
-        case "recompute-tree":
-          this.state = forceRecompute(this.state);
-          break;
+        case "preview-condition":
+          this.updateControlBar(
+            previewNodeCondition(this.state, event.detail.nodeId, {
+              [event.detail.field]: event.detail.value
+            })
+          );
+          return;
         case "condition-edit":
           this.state = updateNodeCondition(this.state, event.detail.nodeId, {
             [event.detail.field]: event.detail.value
@@ -119,7 +124,7 @@ class AppRoot extends HTMLElement {
       </div>
     `;
 
-    this.querySelector("control-bar").state = this.state;
+    this.updateControlBar(this.state);
     this.querySelector("dataset-table").state = this.state;
     this.querySelector("tree-editor").state = this.state;
   }

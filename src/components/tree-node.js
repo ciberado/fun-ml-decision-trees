@@ -142,6 +142,16 @@ class TreeNode extends HTMLElement {
       }
 
       this.applyLivePreview(control.value);
+      this.dispatchEvent(
+        new CustomEvent("preview-condition", {
+          bubbles: true,
+          detail: {
+            nodeId: control.dataset.nodeId,
+            field: control.dataset.conditionField,
+            value: control.value
+          }
+        })
+      );
     });
 
     this.addEventListener("click", (event) => {
@@ -234,8 +244,9 @@ class TreeNode extends HTMLElement {
                 class="stage-play-button"
                 data-play-node="${treeNode.id}"
                 ${flow.type !== "split" || !flow.canPlay ? "disabled" : ""}
+                aria-label="Process next ball"
               >
-                Play
+                &#9654;
               </button>
             </div>
           </div>

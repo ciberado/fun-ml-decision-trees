@@ -50,7 +50,7 @@ export function toggleEvaluation(state) {
 export function resetTree(state) {
   return deriveState({
     ...state,
-    tree: structuredClone(state.baselineTree),
+    tree: makeLeaf("root"),
     ui: {
       ...state.ui,
       selectedRowId: getTargetRowId(state.dataset),
@@ -61,6 +61,27 @@ export function resetTree(state) {
 
 export function forceRecompute(state) {
   return deriveState(state);
+}
+
+export function previewNodeCondition(state, nodeId, patch) {
+  const tree = cloneTree(state.tree);
+  const found = findNodeById(tree, nodeId);
+
+  if (!found || found.node.type !== "split") {
+    throw new Error(`Split node ${nodeId} was not found`);
+  }
+
+  found.node.condition = normalizeCondition({
+    ...found.node.condition,
+    ...patch
+  });
+
+  validateTree(tree);
+
+  return deriveState({
+    ...state,
+    tree
+  });
 }
 
 export function updateNodeCondition(state, nodeId, patch) {

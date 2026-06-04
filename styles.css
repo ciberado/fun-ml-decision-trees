@@ -81,7 +81,7 @@ select {
 }
 
 .hero-copy {
-  max-width: 70ch;
+  width: 100%;
   margin: 12px 0 0;
   font-size: 1.05rem;
   line-height: 1.6;
@@ -210,6 +210,10 @@ select {
   overflow: hidden;
 }
 
+.panel-center {
+  margin-bottom: min(60vh, 30rem);
+}
+
 .subpanel {
   padding: 24px;
 }
@@ -233,7 +237,9 @@ select {
 }
 
 .table-wrap {
-  overflow-x: auto;
+  max-height: min(46vh, 25rem);
+  overflow: auto;
+  border-radius: calc(var(--radius-md) - 4px);
 }
 
 .dataset-table {
@@ -256,6 +262,10 @@ select {
   padding-top: 6px;
   padding-bottom: 6px;
   font-size: 0.8rem;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #fdf7ea;
 }
 
 .dataset-table tbody tr.is-selected {
