@@ -1,4 +1,4 @@
-import { DATASET } from "../data/dataset.js";
+import { DATASET, getTargetRowId } from "../data/dataset.js";
 import { STARTER_TREE } from "../data/starter-tree.js";
 import { makeDefaultSplit, makeLeaf, findNodeById, getSplitDepthForLeafPath, normalizeCondition, replaceNodeAtPath, validateTree, cloneTree, collectNodeIds } from "../domain/tree-utils.js";
 import { MAX_TREE_DEPTH } from "../domain/config.js";
@@ -13,12 +13,14 @@ function deriveState(source) {
 }
 
 export function createInitialState() {
+  const dataset = structuredClone(DATASET);
+
   return deriveState({
-    dataset: structuredClone(DATASET),
+    dataset,
     baselineTree: structuredClone(STARTER_TREE),
     tree: makeLeaf("root"),
     ui: {
-      selectedRowId: 8,
+      selectedRowId: getTargetRowId(dataset),
       showEvaluation: true,
       splitProgress: {}
     }
@@ -51,7 +53,7 @@ export function resetTree(state) {
     tree: structuredClone(state.baselineTree),
     ui: {
       ...state.ui,
-      selectedRowId: 8,
+      selectedRowId: getTargetRowId(state.dataset),
       splitProgress: {}
     }
   });

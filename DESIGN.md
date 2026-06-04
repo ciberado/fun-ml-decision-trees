@@ -14,11 +14,11 @@ This project should reverse that order:
 - keep every row on screen
 - make each branch condition editable
 - show how each row ends up in a leaf
-- show how the tree classifies the unknown row `8`
+- show how the tree classifies the target row
 
 The core teaching question is:
 
-Can we use `size` and `neighborhood` to classify row `8` as `Budget` or `Premium` by routing it through a small set of simple binary rules?
+Can we use `size` and `neighborhood` to classify the target row as `Budget` or `Premium` by routing it through a small set of simple binary rules?
 
 ## Product Goals
 - Make decision trees understandable in a few minutes.
@@ -46,7 +46,7 @@ The design is successful if a first-time user can:
 - identify the features available to the tree
 - explain what a split does
 - follow one row through the tree without confusion
-- understand why row `8` lands in a given leaf
+- understand why the target row lands in a given leaf
 - understand how a leaf produces a class prediction
 - notice when changing the tree improves or worsens the classification results
 
@@ -60,30 +60,30 @@ For the lesson, `Price` is the known real-world outcome for rows `1` through `7`
 
 | ID | Price (€) | Class | Size (m2) | Neighborhood | Price per m2 (€) | Notes |
 |---:|---:|:---:|---:|:---:|---:|---|
-| 1 | 180 | Budget | 100 | A | 1.80 | Typical budget flat in A |
-| 2 | 220 | Budget | 150 | A | 1.47 | Large but still budget in A |
-| 3 | 200 | Budget | 110 | A | 1.82 | Another budget flat in A |
-| 4 | 300 | Premium | 70 | A | 4.29 | Small premium outlier in A |
-| 5 | 340 | Premium | 110 | B | 3.09 | Premium flat in B |
-| 6 | 230 | Budget | 70 | B | 3.29 | Small budget exception in B |
-| 7 | 380 | Premium | 130 | B | 2.92 | Larger premium flat in B |
-| 8 | ? | ? | 60 | B | ? | Target row |
+| 1 | ? | ? | 60 | B | ? | Target row |
+| 2 | 180 | Budget | 100 | A | 1.80 | Typical budget flat in A |
+| 3 | 220 | Budget | 150 | A | 1.47 | Large but still budget in A |
+| 4 | 200 | Budget | 110 | A | 1.82 | Another budget flat in A |
+| 5 | 300 | Premium | 70 | A | 4.29 | Small premium outlier in A |
+| 6 | 340 | Premium | 110 | B | 3.09 | Premium flat in B |
+| 7 | 230 | Budget | 70 | B | 3.29 | Small budget exception in B |
+| 8 | 380 | Premium | 130 | B | 2.92 | Larger premium flat in B |
 
 ### Why This Dataset Works
 - Neighborhood is a stronger signal than size on its own.
 - Size by itself is misleading because some larger flats are still `Budget` while a smaller flat can still be `Premium`.
 - A single neighborhood split helps, but one branch still needs a second split to reach good accuracy.
-- Row `8` is small and in neighborhood `B`, so it still invites discussion instead of feeling automatic.
+- The current target row, row `1`, is small and in neighborhood `B`, so it still invites discussion instead of feeling automatic.
 
 ### Important Constraint
-`price` and `price per m2` are visible in the table, but they must not be used as split features in MVP. Row `8` has unknown price, so allowing those derived values as split inputs would make the exercise logically invalid.
+`price` and `price per m2` are visible in the table, but they must not be used as split features in MVP. The target row has unknown price, so allowing those derived values as split inputs would make the exercise logically invalid.
 
 ## Learning Model
 The app teaches classification, not regression.
 
 - Input features for the tree: `size`, `neighborhood`
-- Known labels for rows `1` through `7`: `Budget`, `Premium`
-- Unknown target: row `8`
+- Known labels for rows `2` through `8`: `Budget`, `Premium`
+- Unknown target: row `1` in the current fixture
 - Positive class for evaluation: `Premium`
 
 ## Experience Overview
@@ -95,7 +95,7 @@ The app should feel like an interactive lesson and a constrained tree editor at 
 3. The user changes split conditions and optionally adds or removes split nodes.
 4. The app recomputes the routing immediately.
 5. Balls move or relocate into the corresponding leaf buckets.
-6. The app shows the predicted class for row `8`.
+6. The app shows the predicted class for the target row.
 7. The app evaluates the current tree on rows `1` through `7`.
 8. The app warns if the current tree performs worse than the starter tree baseline.
 
@@ -103,7 +103,7 @@ The app should feel like an interactive lesson and a constrained tree editor at 
 - Every edit must produce immediate visible feedback.
 - The tree must stay readable for beginners.
 - Motion should clarify routing, not slow it down.
-- Row `8` must always be easy to identify.
+- The target row must always be easy to identify.
 - The raw dataset should remain visible while editing and evaluating the tree.
 
 ## Design Decisions
@@ -159,7 +159,7 @@ This starter tree is simple enough to understand immediately and useful enough t
 - Show `Price`, `Class`, `Size`, `Neighborhood`, and `Price per m2`.
 - Mark `Price` and `Price per m2` as display-only fields in the UI.
 - Represent each row as a ball with its row ID centered inside it.
-- Use a distinct visual treatment for row `8`.
+- Use a distinct visual treatment for the target row.
 - Allow selecting a row to highlight its path and details.
 
 ### Tree Representation
@@ -185,10 +185,10 @@ This starter tree is simple enough to understand immediately and useful enough t
   - remove a split node and collapse its subtree into a leaf
 
 ### Prediction
-- The app must support row `8` with unknown `price` and unknown `class`.
-- Once row `8` reaches a leaf, the app must display its predicted class.
+- The app must support a target row with unknown `price` and unknown `class`.
+- Once the target row reaches a leaf, the app must display its predicted class.
 - The prediction explanation must show:
-  - the path row `8` followed
+  - the path the target row followed
   - the known rows in the same leaf
   - the rule used to assign the leaf label
 
@@ -264,7 +264,7 @@ The UI should surface when a global-majority fallback was used, whether due to a
 ### Testing Goals
 - Verify that tree logic is correct before relying on the UI.
 - Prevent invalid editor states.
-- Ensure the prediction for row `8` is reproducible from the visible rules.
+- Ensure the prediction for the target row is reproducible from the visible rules.
 - Ensure evaluation metrics and baseline warnings remain trustworthy after edits.
 - Catch regressions in accessibility-critical behavior.
 
@@ -279,7 +279,7 @@ The UI should surface when a global-majority fallback was used, whether due to a
 The MVP should not be considered complete unless these scenarios pass:
 
 1. The default starter tree routes all rows into deterministic leaves.
-2. Row `8` receives a predicted class from the starter tree.
+2. The target row receives a predicted class from the starter tree.
 3. Editing a split condition recomputes row paths, leaf assignments, prediction, and evaluation.
 4. Adding a split to an allowed leaf updates the tree without violating the depth limit.
 5. Removing a split collapses the subtree into a valid leaf and recomputes correctly.
@@ -295,7 +295,7 @@ The MVP should not be considered complete unless these scenarios pass:
 - leaf classification correctness
 - baseline comparison correctness
 - selected-row path rendering
-- row `8` visual distinction
+- target-row visual distinction
 - display-only treatment of `Price` and `Price per m2`
 
 ## Information Architecture
@@ -323,7 +323,7 @@ For future responsive adaptation, sections should stack in this order:
 
 ## Visual Design Direction
 - Balls should be small, readable, and clearly grouped by leaf.
-- Row `8` should always stand out visually.
+- The target row should always stand out visually.
 - Branch nodes should look like classroom question cards.
 - Leaf buckets should look like explicit containers, not abstract labels.
 - The palette should feel light and classroom-like.
@@ -351,7 +351,7 @@ For future responsive adaptation, sections should stack in this order:
 - `leaf-bucket`
   - renders one leaf and its assigned rows
 - `prediction-panel`
-  - shows row `8` path and predicted class
+  - shows the target-row path and predicted class
 - `evaluation-panel`
   - shows metrics and classification errors
 - `control-bar`
@@ -363,14 +363,14 @@ Suggested app state:
 ```js
 {
   dataset: [
-    { id: 1, price: 100, label: "Budget", size: 100, neighborhood: "A" },
-    { id: 2, price: 50, label: "Budget", size: 80, neighborhood: "A" },
-    { id: 3, price: 200, label: "Budget", size: 70, neighborhood: "B" },
-    { id: 4, price: 300, label: "Premium", size: 180, neighborhood: "A" },
-    { id: 5, price: 300, label: "Premium", size: 100, neighborhood: "B" },
-    { id: 6, price: 250, label: "Budget", size: 80, neighborhood: "B" },
-    { id: 7, price: 400, label: "Premium", size: 120, neighborhood: "B" },
-    { id: 8, price: null, label: null, size: 60, neighborhood: "B", isTarget: true }
+    { id: 1, price: null, label: null, size: 60, neighborhood: "B", isTarget: true },
+    { id: 2, price: 180, label: "Budget", size: 100, neighborhood: "A" },
+    { id: 3, price: 220, label: "Budget", size: 150, neighborhood: "A" },
+    { id: 4, price: 200, label: "Budget", size: 110, neighborhood: "A" },
+    { id: 5, price: 300, label: "Premium", size: 70, neighborhood: "A" },
+    { id: 6, price: 340, label: "Premium", size: 110, neighborhood: "B" },
+    { id: 7, price: 230, label: "Budget", size: 70, neighborhood: "B" },
+    { id: 8, price: 380, label: "Premium", size: 130, neighborhood: "B" }
   ],
   baselineTree: { ... },
   tree: { ... },
@@ -379,7 +379,7 @@ Suggested app state:
     leafAssignments: {}
   },
   prediction: {
-    targetRowId: 8,
+    targetRowId: 1,
     predictedLabel: null,
     predictedLeafId: null,
     usedTieBreak: false
@@ -401,7 +401,7 @@ Suggested app state:
     hasFalseNegativeWarning: false
   },
   ui: {
-    selectedRowId: 8,
+    selectedRowId: 1,
     showEvaluation: true
   }
 }
@@ -470,9 +470,9 @@ For each row:
 5. Record the path and final leaf assignment.
 
 ### Prediction Algorithm
-For row `8`:
+For the target row:
 
-1. Route row `8` through the current tree.
+1. Route the target row through the current tree.
 2. Identify its leaf.
 3. Collect known rows in that leaf.
 4. Determine the leaf label using majority vote.
@@ -480,7 +480,7 @@ For row `8`:
 6. Display the predicted class and path summary.
 
 ### Evaluation Algorithm
-For rows `1` through `7`:
+For the known rows:
 
 1. Route each row through the current tree.
 2. Determine the predicted label of its leaf.
@@ -498,7 +498,7 @@ Even though the editor is free-form, the experience should still guide the learn
 2. Let the learner inspect how the known rows are grouped.
 3. Let the learner change a split and immediately see the consequences.
 4. Let the learner add one more split to refine a leaf.
-5. Show the predicted class for row `8`.
+5. Show the predicted class for the target row.
 6. Show whether the edit improved or worsened accuracy on the known rows.
 
 ### Copy Style
@@ -519,8 +519,8 @@ The first version should include:
 - a maximum tree depth of `4`
 - immediate rerouting after edits
 - visible leaf buckets
-- predicted class for row `8`
-- structured path explanation for row `8`
+- predicted class for the target row
+- structured path explanation for the target row
 - evaluation metrics for rows `1` through `7`
 - warning when the edited tree performs worse than the starter tree
 - stateless behavior across refreshes
@@ -544,4 +544,4 @@ The first version should include:
 - If routing updates are too animated later, clarity may decrease instead of improve.
 
 ## Final Recommendation
-The right first version is a constrained free-form editor with a classroom tone. Users should start from a sensible example tree, edit it within a depth limit of `4`, immediately see how the data moves, receive a class prediction for row `8`, and see whether their edits made the model better or worse on the known rows.
+The right first version is a constrained free-form editor with a classroom tone. Users should start from a sensible example tree, edit it within a depth limit of `4`, immediately see how the data moves, receive a class prediction for the target row, and see whether their edits made the model better or worse on the known rows.

@@ -4,9 +4,9 @@ import { DATASET } from "../../src/data/dataset.js";
 import { STARTER_TREE } from "../../src/data/starter-tree.js";
 import { routeRow } from "../../src/domain/route-row.js";
 
-test("routeRow routes row 8 through the starter tree", () => {
-  const row8 = DATASET.find((row) => row.id === 8);
-  const routed = routeRow(STARTER_TREE, row8);
+test("routeRow routes the target row through the starter tree", () => {
+  const targetRow = DATASET.find((row) => row.isTarget);
+  const routed = routeRow(STARTER_TREE, targetRow);
 
   assert.equal(routed.leafId, "leaf-b-small");
   assert.deepEqual(

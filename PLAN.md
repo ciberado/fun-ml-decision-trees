@@ -46,7 +46,7 @@ Implement the data model and the pure decision-tree logic before building richer
 - given the dataset and tree, the code computes:
   - row paths
   - leaf assignments
-  - row `8` prediction
+  - target-row prediction
   - evaluation metrics
 - logic can run without the visual layer
 
@@ -74,7 +74,7 @@ Render the real dataset and tree using the computed state, without complex editi
 ### Exit Criteria
 - all rows appear in the UI
 - the tree and leaves reflect the computed assignments
-- row `8` prediction is visible
+- the target-row prediction is visible
 - evaluation metrics are visible
 
 ### Test Gate
@@ -193,7 +193,7 @@ Pure logic should be tested first and kept deterministic:
 - route one row through a tree
 - route all rows through a tree
 - classify one leaf
-- predict row `8`
+- predict the target row
 - compute evaluation metrics
 - compare current metrics with baseline metrics
 - validate tree depth and legal feature/operator combinations
@@ -210,7 +210,7 @@ The recomputation pipeline should be verified end to end:
 Manual passes should cover:
 
 - first-load clarity
-- row `8` discoverability
+- target-row discoverability
 - understanding of display-only fields
 - readability of warnings
 - keyboard interaction
@@ -223,4 +223,4 @@ Manual passes should cover:
 4. Manual exploratory testing before marking a phase complete
 
 ## Definition Of MVP Complete
-The MVP is complete when a user can load the app, inspect the dataset, edit a constrained binary tree, see rows routed into leaf buckets, get a class prediction for row `8`, and understand through metrics and warnings whether the edited tree is better or worse than the starter tree.
+The MVP is complete when a user can load the app, inspect the dataset, edit a constrained binary tree, see rows routed into leaf buckets, get a class prediction for the target row, and understand through metrics and warnings whether the edited tree is better or worse than the starter tree.

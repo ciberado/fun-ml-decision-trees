@@ -98,7 +98,7 @@ class DatasetTable extends HTMLElement {
             Leaf prediction: <strong>${selectedRow.leafPrediction}</strong>
           </p>
           <p class="detail-copy">
-            Row 8 currently lands in <strong>${prediction.predictedLeafId}</strong> and is predicted as
+            Row ${prediction.targetRowId} currently lands in <strong>${prediction.predictedLeafId}</strong> and is predicted as
             <strong>${prediction.predictedLabel}</strong>.
           </p>
         </section>

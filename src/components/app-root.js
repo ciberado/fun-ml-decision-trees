@@ -90,11 +90,13 @@ class AppRoot extends HTMLElement {
   }
 
   render() {
+    const targetRowId = this.state.prediction.targetRowId;
+
     this.innerHTML = `
       <div class="page-shell">
         <header class="hero">
           <p class="eyebrow">Interactive Lesson</p>
-          <h1>Build a tiny decision tree for row 8</h1>
+          <h1>Build a tiny decision tree for row ${targetRowId}</h1>
           <p class="hero-copy">
             Edit binary rules with <strong>size</strong> and <strong>neighborhood</strong>,
             route every housing row into a leaf, and watch how the prediction changes.

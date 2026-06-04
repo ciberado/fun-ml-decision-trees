@@ -19,12 +19,13 @@ class EvaluationPanel extends HTMLElement {
       return;
     }
 
-    const { evaluation } = this._state;
+    const { dataset, evaluation } = this._state;
+    const knownRowIds = dataset.filter((row) => !row.isTarget).map((row) => row.id);
 
     this.innerHTML = `
       <section class="subpanel">
         <p class="eyebrow">Evaluation</p>
-        <h2>Known rows 1 to 7 score the current tree</h2>
+        <h2>Known rows ${knownRowIds[0]} to ${knownRowIds[knownRowIds.length - 1]} score the current tree</h2>
 
         <div class="metric-grid">
           <article class="metric-card">

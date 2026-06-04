@@ -55,7 +55,7 @@ Pure logic for:
 - routing a row through a tree
 - assigning all rows to leaves
 - computing leaf labels
-- predicting row `8`
+- predicting the target row
 - computing evaluation metrics
 - comparing current metrics against baseline metrics
 
@@ -143,11 +143,11 @@ Each row should contain:
 }
 ```
 
-For row `8`:
+For the current target row:
 
 ```js
 {
-  id: 8,
+  id: 1,
   price: null,
   label: null,
   size: 60,
@@ -197,7 +197,7 @@ Derived state should be recomputed, not manually edited:
 
 - row paths
 - leaf assignments
-- predicted label for row `8`
+- predicted label for the target row
 - tie-break usage
 - current accuracy
 - current false positives
@@ -210,7 +210,7 @@ After any valid tree edit:
 1. validate tree constraints
 2. route all rows
 3. classify leaves
-4. predict row `8`
+4. predict the target row
 5. evaluate rows `1` through `7`
 6. compare current metrics to baseline
 7. trigger UI update
@@ -230,7 +230,7 @@ After any valid tree edit:
 ### `row-ball-layer`
 - renders visual row tokens
 - reflects current leaf assignments
-- highlights row `8` and selected row
+- highlights the target row and selected row
 
 ### `tree-editor`
 - renders the tree recursively
@@ -334,7 +334,7 @@ Priority should go to pure domain functions:
 
 #### Row Routing
 - route each known row through the default starter tree
-- route row `8` through the default starter tree
+- route the target row through the default starter tree
 - verify expected leaf IDs for a known sample tree
 
 #### Leaf Classification
@@ -378,7 +378,7 @@ At the DOM level, verify:
 
 - dataset table renders all rows
 - row balls count matches dataset rows
-- row `8` has distinct styling and labeling
+- the target row has distinct styling and labeling
 - split editor shows only `size` and `neighborhood`
 - `Price`, `Class`, and `Price per m2` do not appear as split feature options
 - baseline warnings render independently
@@ -409,7 +409,7 @@ Before accepting a release candidate, manually verify:
 These failures should block release:
 
 - incorrect routing
-- incorrect class prediction for row `8`
+- incorrect class prediction for the target row
 - incorrect evaluation metrics
 - invalid split features exposed in the editor
 - missing or incorrect baseline warnings

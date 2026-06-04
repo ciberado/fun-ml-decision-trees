@@ -12,7 +12,7 @@ class PredictionPanel extends HTMLElement {
       return;
     }
 
-    const { dataset, prediction, selectedRow, routing } = this._state;
+    const { dataset, prediction, selectedRow } = this._state;
     const rowsById = Object.fromEntries(dataset.map((row) => [row.id, row]));
     const targetLeafRows = prediction.leafRowIds.map((rowId) => rowsById[rowId]);
     const selectedLeafRows = selectedRow.leafRowIds.map((rowId) => rowsById[rowId]);
@@ -20,13 +20,13 @@ class PredictionPanel extends HTMLElement {
     this.innerHTML = `
       <section class="subpanel highlight-panel">
         <p class="eyebrow">Prediction</p>
-        <h2>Row 8 is currently predicted as ${prediction.predictedLabel}</h2>
+        <h2>Row ${prediction.targetRowId} is currently predicted as ${prediction.predictedLabel}</h2>
         <p class="detail-copy">
           Path: ${prediction.path.map((step) => formatCondition(step.condition)).join(" -> ")} -> Leaf ${prediction.predictedLeafId}
         </p>
         <p class="detail-copy">${describeFallback(prediction.fallbackReason)}</p>
         <div class="member-block">
-          <p class="member-heading">Rows in the same leaf as row 8</p>
+          <p class="member-heading">Rows in the same leaf as row ${prediction.targetRowId}</p>
           <row-ball-layer data-slot="target"></row-ball-layer>
         </div>
       </section>

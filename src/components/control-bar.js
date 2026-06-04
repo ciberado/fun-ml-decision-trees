@@ -47,10 +47,10 @@ class ControlBar extends HTMLElement {
           </button>
         </div>
         <div class="summary-pills" aria-label="Model summary">
-          <span class="summary-pill">Row 8: <strong>${prediction.predictedLabel}</strong></span>
+          <span class="summary-pill">Row ${prediction.targetRowId}: <strong>${prediction.predictedLabel}</strong></span>
           <span class="summary-pill">Accuracy: <strong>${formatPercent(evaluation.accuracy)}</strong></span>
-          <span class="summary-pill">FP: <strong>${evaluation.falsePositives.length}</strong></span>
-          <span class="summary-pill">FN: <strong>${evaluation.falseNegatives.length}</strong></span>
+          <span class="summary-pill">False Positives: <strong>${evaluation.falsePositives.length}</strong></span>
+          <span class="summary-pill">False Negatives: <strong>${evaluation.falseNegatives.length}</strong></span>
         </div>
       </section>
     `;

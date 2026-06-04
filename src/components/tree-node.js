@@ -204,7 +204,7 @@ class TreeNode extends HTMLElement {
     const sourceCardClasses = [
       "stage-source-card",
       isSelectedLeaf ? "is-active" : "",
-      flow.rowIds.includes(8) ? "contains-target" : ""
+      flow.rows.some((row) => row.isTarget) ? "contains-target" : ""
     ]
       .filter(Boolean)
       .join(" ");

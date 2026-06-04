@@ -54,8 +54,8 @@ test("playing a split moves one ball at a time and condition edits redistribute 
 
   assert.equal(afterOnePlay.editor.nodesById.root.processedCount, 1);
   assert.deepEqual(afterOnePlay.editor.nodesById.root.remainingRowIds, [2, 3, 4, 5, 6, 7, 8]);
-  assert.deepEqual(afterOnePlay.editor.nodesById[afterOnePlay.tree.trueBranch.id].rowIds, []);
-  assert.deepEqual(afterOnePlay.editor.nodesById[afterOnePlay.tree.falseBranch.id].rowIds, [1]);
+  assert.deepEqual(afterOnePlay.editor.nodesById[afterOnePlay.tree.trueBranch.id].rowIds, [1]);
+  assert.deepEqual(afterOnePlay.editor.nodesById[afterOnePlay.tree.falseBranch.id].rowIds, []);
 
   const redistributed = updateNodeCondition(afterOnePlay, "root", {
     operator: ">",
@@ -64,8 +64,8 @@ test("playing a split moves one ball at a time and condition edits redistribute 
 
   assert.equal(redistributed.editor.nodesById.root.processedCount, 1);
   assert.deepEqual(redistributed.editor.nodesById.root.remainingRowIds, [2, 3, 4, 5, 6, 7, 8]);
-  assert.deepEqual(redistributed.editor.nodesById[redistributed.tree.trueBranch.id].rowIds, [1]);
-  assert.deepEqual(redistributed.editor.nodesById[redistributed.tree.falseBranch.id].rowIds, []);
+  assert.deepEqual(redistributed.editor.nodesById[redistributed.tree.trueBranch.id].rowIds, []);
+  assert.deepEqual(redistributed.editor.nodesById[redistributed.tree.falseBranch.id].rowIds, [1]);
 });
 
 test("leaf buckets get a class marker only after upstream processing is complete", () => {
