@@ -20,7 +20,7 @@ Keep tests separate from runtime code, ideally under `tests/` with domain and UI
 ## Build, Test, and Development Commands
 No build pipeline is checked in yet. Keep the app runnable as static files.
 
-- `python3 -m http.server 8000`
+- `npx http-server --port 8080 --cors`
   Starts a simple local server from the repo root once `index.html` exists.
 - `rg --files`
   Fast way to inspect repository contents.
@@ -48,6 +48,8 @@ Follow the detailed strategy in `ARCHITECTURE.md`.
 - Add DOM/UI checks for editor constraints and row `8` behavior
 
 Use descriptive test names, for example: `route-row routes row-8 through starter tree`.
+
+Regularly check that everything works as expected using your playwright mcp.
 
 ## Commit & Pull Request Guidelines
 Current history uses short imperative commit messages, for example: `Add final design document`. Continue that style.
