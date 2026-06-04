@@ -1,6 +1,6 @@
 import { DATASET } from "../data/dataset.js";
 import { STARTER_TREE } from "../data/starter-tree.js";
-import { makeDefaultSplit, findNodeById, getSplitDepthForLeafPath, normalizeCondition, replaceNodeAtPath, validateTree, cloneTree } from "../domain/tree-utils.js";
+import { makeDefaultSplit, makeLeaf, findNodeById, getSplitDepthForLeafPath, normalizeCondition, replaceNodeAtPath, validateTree, cloneTree, collectNodeIds } from "../domain/tree-utils.js";
 import { MAX_TREE_DEPTH } from "../domain/config.js";
 import { recomputeDerivedState } from "./recompute.js";
 import { createNodeId } from "../utils/ids.js";
@@ -16,10 +16,11 @@ export function createInitialState() {
   return deriveState({
     dataset: structuredClone(DATASET),
     baselineTree: structuredClone(STARTER_TREE),
-    tree: structuredClone(STARTER_TREE),
+    tree: makeLeaf("root"),
     ui: {
       selectedRowId: 8,
-      showEvaluation: true
+      showEvaluation: true,
+      splitProgress: {}
     }
   });
 }
@@ -50,7 +51,8 @@ export function resetTree(state) {
     tree: structuredClone(state.baselineTree),
     ui: {
       ...state.ui,
-      selectedRowId: 8
+      selectedRowId: 8,
+      splitProgress: {}
     }
   });
 }
@@ -80,6 +82,29 @@ export function updateNodeCondition(state, nodeId, patch) {
   });
 }
 
+export function playSplitNode(state, nodeId) {
+  const nodeFlow = state.editor.nodesById[nodeId];
+
+  if (!nodeFlow || nodeFlow.type !== "split") {
+    throw new Error(`Split node ${nodeId} was not found`);
+  }
+
+  if (!nodeFlow.canPlay) {
+    return state;
+  }
+
+  return deriveState({
+    ...state,
+    ui: {
+      ...state.ui,
+      splitProgress: {
+        ...state.ui.splitProgress,
+        [nodeId]: (state.ui.splitProgress[nodeId] ?? 0) + 1
+      }
+    }
+  });
+}
+
 export function addSplitAtLeaf(state, leafId) {
   const found = findNodeById(state.tree, leafId);
 
@@ -94,7 +119,7 @@ export function addSplitAtLeaf(state, leafId) {
   }
 
   const replacement = makeDefaultSplit(
-    createNodeId("split"),
+    leafId,
     createNodeId("leaf"),
     createNodeId("leaf")
   );
@@ -104,7 +129,14 @@ export function addSplitAtLeaf(state, leafId) {
 
   return deriveState({
     ...state,
-    tree
+    tree,
+    ui: {
+      ...state.ui,
+      splitProgress: {
+        ...state.ui.splitProgress,
+        [replacement.id]: 0
+      }
+    }
   });
 }
 
@@ -115,16 +147,21 @@ export function removeSplitNode(state, nodeId) {
     throw new Error(`Split node ${nodeId} was not found`);
   }
 
-  const replacement = {
-    id: createNodeId("leaf"),
-    type: "leaf"
-  };
+  const replacement = makeLeaf(nodeId);
 
   const tree = replaceNodeAtPath(state.tree, found.path, replacement);
   validateTree(tree);
+  const removedIds = new Set(collectNodeIds(found.node));
+  const nextSplitProgress = Object.fromEntries(
+    Object.entries(state.ui.splitProgress).filter(([id]) => !removedIds.has(id))
+  );
 
   return deriveState({
     ...state,
-    tree
+    tree,
+    ui: {
+      ...state.ui,
+      splitProgress: nextSplitProgress
+    }
   });
 }

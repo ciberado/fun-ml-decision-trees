@@ -30,6 +30,22 @@ class RowBallLayer extends HTMLElement {
     this.render();
   }
 
+  getTooltip(row) {
+    const price = row.price == null ? "?" : `€${row.price}`;
+    const label = row.label ?? "?";
+    const pricePerM2 =
+      row.price == null ? "?" : `€${(row.price / row.size).toFixed(2)}`;
+
+    return [
+      `Row ${row.id}${row.isTarget ? " (target)" : ""}`,
+      `Class: ${label}`,
+      `Price: ${price}`,
+      `Size: ${row.size} m2`,
+      `Neighborhood: ${row.neighborhood}`,
+      `Price per m2: ${pricePerM2}`
+    ].join("\n");
+  }
+
   render() {
     const rows = this._rows ?? [];
 
@@ -39,6 +55,8 @@ class RowBallLayer extends HTMLElement {
           .map((row) => {
             const classes = [
               "row-ball",
+              row.label === "Premium" ? "is-premium" : "",
+              row.label === "Budget" ? "is-budget" : "",
               row.isTarget ? "is-target" : "",
               row.id === this._selectedRowId ? "is-selected" : ""
             ]
@@ -46,7 +64,13 @@ class RowBallLayer extends HTMLElement {
               .join(" ");
 
             return `
-              <button type="button" class="${classes}" data-row-ball="${row.id}" aria-label="Select row ${row.id}">
+              <button
+                type="button"
+                class="${classes}"
+                data-row-ball="${row.id}"
+                aria-label="Select row ${row.id}"
+                title="${this.getTooltip(row)}"
+              >
                 ${row.id}
               </button>
             `;

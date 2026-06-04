@@ -11,6 +11,17 @@ export function makeLeaf(id) {
   };
 }
 
+export function collectNodeIds(node, nodeIds = []) {
+  nodeIds.push(node.id);
+
+  if (node.type === "split") {
+    collectNodeIds(node.trueBranch, nodeIds);
+    collectNodeIds(node.falseBranch, nodeIds);
+  }
+
+  return nodeIds;
+}
+
 export function makeDefaultSplit(id, trueLeafId, falseLeafId) {
   return {
     id,

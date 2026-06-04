@@ -1,5 +1,7 @@
 import { compareBaseline } from "../domain/compare-baseline.js";
 import { classifyLeaf } from "../domain/classify-leaf.js";
+import { MAX_TREE_DEPTH } from "../domain/config.js";
+import { evaluateCondition } from "../domain/evaluate-condition.js";
 import { evaluateModel } from "../domain/evaluate-model.js";
 import { routeAllRows } from "../domain/route-all-rows.js";
 import { validateTree } from "../domain/tree-utils.js";
@@ -49,6 +51,97 @@ function summarizePath(path, targetLeafId) {
   return [...steps, `Leaf ${targetLeafId}`];
 }
 
+export function buildEditorFlow(node, rows, splitProgress, nodesById = {}, depth = 1, isSettled = true) {
+  if (node.type === "leaf") {
+    const knownRows = rows.filter((row) => !row.isTarget && row.label);
+    const counts = knownRows.reduce(
+      (summary, row) => {
+        summary[row.label] += 1;
+        return summary;
+      },
+      { Budget: 0, Premium: 0 }
+    );
+    const majorityLabel =
+      counts.Budget === counts.Premium || knownRows.length === 0
+        ? null
+        : counts.Budget > counts.Premium
+          ? "Budget"
+          : "Premium";
+
+    const leafFlow = {
+      nodeId: node.id,
+      type: "leaf",
+      depth,
+      rowIds: rows.map((row) => row.id),
+      rows,
+      isSettled,
+      majorityLabel,
+      majorityCounts: counts,
+      canAddSplit: depth <= MAX_TREE_DEPTH,
+      canPlay: false,
+      processedCount: 0,
+      remainingRowIds: rows.map((row) => row.id),
+      trueBranch: null,
+      falseBranch: null
+    };
+
+    nodesById[node.id] = leafFlow;
+    return leafFlow;
+  }
+
+  const processedCount = Math.max(
+    0,
+    Math.min(splitProgress[node.id] ?? 0, rows.length)
+  );
+  const processedRows = rows.slice(0, processedCount);
+  const remainingRows = rows.slice(processedCount);
+  const trueRows = [];
+  const falseRows = [];
+
+  for (const row of processedRows) {
+    if (evaluateCondition(node.condition, row)) {
+      trueRows.push(row);
+    } else {
+      falseRows.push(row);
+    }
+  }
+
+  const splitFlow = {
+    nodeId: node.id,
+    type: "split",
+    depth,
+    isSettled,
+    rowIds: rows.map((row) => row.id),
+    rows,
+    processedCount,
+    canPlay: processedCount < rows.length,
+    canAddSplit: false,
+    remainingRowIds: remainingRows.map((row) => row.id),
+    remainingRows,
+    trueRowIds: trueRows.map((row) => row.id),
+    falseRowIds: falseRows.map((row) => row.id),
+    trueBranch: buildEditorFlow(
+      node.trueBranch,
+      trueRows,
+      splitProgress,
+      nodesById,
+      depth + 1,
+      isSettled && processedCount === rows.length
+    ),
+    falseBranch: buildEditorFlow(
+      node.falseBranch,
+      falseRows,
+      splitProgress,
+      nodesById,
+      depth + 1,
+      isSettled && processedCount === rows.length
+    )
+  };
+
+  nodesById[node.id] = splitFlow;
+  return splitFlow;
+}
+
 export function recomputeDerivedState({ dataset, tree, baselineTree, ui }) {
   validateTree(tree);
   validateTree(baselineTree);
@@ -69,6 +162,8 @@ export function recomputeDerivedState({ dataset, tree, baselineTree, ui }) {
   const selectedLeafId = routing.rowLeafIds[selectedRowId];
   const selectedLeaf = leafDetails[selectedLeafId];
   const selectedPath = routing.rowPaths[selectedRowId] ?? [];
+  const editorNodesById = {};
+  const editorFlow = buildEditorFlow(tree, dataset, ui.splitProgress ?? {}, editorNodesById);
 
   return {
     globalMajority,
@@ -103,6 +198,10 @@ export function recomputeDerivedState({ dataset, tree, baselineTree, ui }) {
       leafRowIds: selectedLeaf.rowIds,
       usedTieBreak: selectedLeaf.usedTieBreak,
       fallbackReason: selectedLeaf.fallbackReason
+    },
+    editor: {
+      flow: editorFlow,
+      nodesById: editorNodesById
     }
   };
 }

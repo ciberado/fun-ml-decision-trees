@@ -11,28 +11,26 @@ class TreeEditor extends HTMLElement {
       return;
     }
 
-    const activeNodeIds = this._state.selectedRow.path.map((step) => step.nodeId);
-
     this.innerHTML = `
       <section class="subpanel">
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Tree Editor</p>
-            <h2>Binary rules route the row balls</h2>
+            <h2>Process one ball at a time</h2>
           </div>
-          <p class="inline-hint">Only <strong>size</strong> and <strong>neighborhood</strong> can be used for splits. Max depth: 4.</p>
+          <p class="inline-hint">Add a split to a bucket, then use <strong>Play</strong> to move the next ball into the matching side.</p>
         </div>
         <tree-node></tree-node>
       </section>
     `;
 
     this.querySelector("tree-node").data = {
-      node: this._state.tree,
-      depth: 1,
-      leafDetails: this._state.routing.leafDetails,
+      flow: this._state.editor.flow,
+      treeNode: this._state.tree,
+      dataset: this._state.dataset,
+      splitProgress: this._state.ui.splitProgress,
       selectedRowId: this._state.selectedRow.rowId,
-      activeNodeIds,
-      activeLeafId: this._state.selectedRow.leafId
+      selectedLeafId: this._state.selectedRow.leafId
     };
   }
 }

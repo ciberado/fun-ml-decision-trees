@@ -40,11 +40,6 @@ class DatasetTable extends HTMLElement {
         <div class="panel-heading">
           <div>
             <p class="eyebrow">Dataset</p>
-            <h2>Housing rows stay visible</h2>
-          </div>
-          <div class="inline-note-list">
-            <span class="tag is-input">Split inputs: size, neighborhood</span>
-            <span class="tag is-display">Display only: price, price per m2</span>
           </div>
         </div>
 
@@ -53,11 +48,11 @@ class DatasetTable extends HTMLElement {
             <thead>
               <tr>
                 <th scope="col">Select</th>
-                <th scope="col">Price <span class="mini-tag">Display only</span></th>
+                <th scope="col">Price</th>
                 <th scope="col">Class</th>
                 <th scope="col">Size</th>
-                <th scope="col">Neighborhood</th>
-                <th scope="col">Price per m2 <span class="mini-tag">Display only</span></th>
+                <th scope="col">N.</th>
+                <th scope="col">€/m2</th>
               </tr>
             </thead>
             <tbody>
@@ -74,7 +69,7 @@ class DatasetTable extends HTMLElement {
                     <tr class="${rowClass}">
                       <td>
                         <button type="button" class="row-select-button" data-row-select="${row.id}">
-                          Row ${row.id}
+                          ${row.id}
                         </button>
                       </td>
                       <td>${formatPrice(row.price)}</td>

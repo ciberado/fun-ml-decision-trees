@@ -2,6 +2,7 @@ import {
   addSplitAtLeaf,
   createInitialState,
   forceRecompute,
+  playSplitNode,
   removeSplitNode,
   resetTree,
   selectRow,
@@ -21,6 +22,7 @@ const EVENT_NAMES = [
   "recompute-tree",
   "condition-edit",
   "add-split",
+  "play-node",
   "remove-split"
 ];
 
@@ -69,6 +71,9 @@ class AppRoot extends HTMLElement {
         case "add-split":
           this.state = addSplitAtLeaf(this.state, event.detail.leafId);
           break;
+        case "play-node":
+          this.state = playSplitNode(this.state, event.detail.nodeId);
+          break;
         case "remove-split":
           this.state = removeSplitNode(this.state, event.detail.nodeId);
           break;
@@ -108,18 +113,6 @@ class AppRoot extends HTMLElement {
           <section class="panel panel-center">
             <tree-editor></tree-editor>
           </section>
-
-          <section class="panel panel-right">
-            <prediction-panel></prediction-panel>
-            ${
-              this.state.ui.showEvaluation
-                ? `<evaluation-panel></evaluation-panel>`
-                : `<section class="subpanel muted-panel">
-                    <h2>Evaluation Hidden</h2>
-                    <p>Use the toggle above to compare your edited tree against the starter baseline.</p>
-                  </section>`
-            }
-          </section>
         </main>
       </div>
     `;
@@ -127,11 +120,6 @@ class AppRoot extends HTMLElement {
     this.querySelector("control-bar").state = this.state;
     this.querySelector("dataset-table").state = this.state;
     this.querySelector("tree-editor").state = this.state;
-    this.querySelector("prediction-panel").state = this.state;
-
-    if (this.state.ui.showEvaluation) {
-      this.querySelector("evaluation-panel").state = this.state;
-    }
   }
 }
 

@@ -60,20 +60,20 @@ For the lesson, `Price` is the known real-world outcome for rows `1` through `7`
 
 | ID | Price (€) | Class | Size (m2) | Neighborhood | Price per m2 (€) | Notes |
 |---:|---:|:---:|---:|:---:|---:|---|
-| 1 | 100 | Budget | 100 | A | 1.00 | Baseline example |
-| 2 | 50 | Budget | 80 | A | 0.63 | Smaller, cheaper |
-| 3 | 200 | Budget | 70 | B | 2.86 | Smaller but more expensive area |
-| 4 | 300 | Premium | 180 | A | 1.67 | Larger flat in A |
-| 5 | 300 | Premium | 100 | B | 3.00 | Same price as row 4, different size and area |
-| 6 | 250 | Budget | 80 | B | 3.13 | Compact flat in B |
-| 7 | 400 | Premium | 120 | B | 3.33 | Largest price in the set |
+| 1 | 180 | Budget | 100 | A | 1.80 | Typical budget flat in A |
+| 2 | 220 | Budget | 150 | A | 1.47 | Large but still budget in A |
+| 3 | 200 | Budget | 110 | A | 1.82 | Another budget flat in A |
+| 4 | 300 | Premium | 70 | A | 4.29 | Small premium outlier in A |
+| 5 | 340 | Premium | 110 | B | 3.09 | Premium flat in B |
+| 6 | 230 | Budget | 70 | B | 3.29 | Small budget exception in B |
+| 7 | 380 | Premium | 130 | B | 2.92 | Larger premium flat in B |
 | 8 | ? | ? | 60 | B | ? | Target row |
 
 ### Why This Dataset Works
-- Size often increases price, but not always by itself.
-- Neighborhood B is generally more expensive than A.
-- Different rows can have similar values for one feature but different outcomes overall.
-- Row `8` is small but located in the more expensive neighborhood, so it is not trivial.
+- Neighborhood is a stronger signal than size on its own.
+- Size by itself is misleading because some larger flats are still `Budget` while a smaller flat can still be `Premium`.
+- A single neighborhood split helps, but one branch still needs a second split to reach good accuracy.
+- Row `8` is small and in neighborhood `B`, so it still invites discussion instead of feeling automatic.
 
 ### Important Constraint
 `price` and `price per m2` are visible in the table, but they must not be used as split features in MVP. Row `8` has unknown price, so allowing those derived values as split inputs would make the exercise logically invalid.
