@@ -1,0 +1,138 @@
+import {
+  addSplitAtLeaf,
+  createInitialState,
+  forceRecompute,
+  removeSplitNode,
+  resetTree,
+  selectRow,
+  toggleEvaluation,
+  updateNodeCondition
+} from "../state/app-state.js";
+import "./control-bar.js";
+import "./dataset-table.js";
+import "./tree-editor.js";
+import "./prediction-panel.js";
+import "./evaluation-panel.js";
+
+const EVENT_NAMES = [
+  "row-select",
+  "toggle-evaluation",
+  "reset-tree",
+  "recompute-tree",
+  "condition-edit",
+  "add-split",
+  "remove-split"
+];
+
+class AppRoot extends HTMLElement {
+  constructor() {
+    super();
+    this.state = createInitialState();
+    this.notice = "";
+    this.handleEvent = this.handleEvent.bind(this);
+  }
+
+  connectedCallback() {
+    for (const eventName of EVENT_NAMES) {
+      this.addEventListener(eventName, this.handleEvent);
+    }
+
+    this.render();
+  }
+
+  disconnectedCallback() {
+    for (const eventName of EVENT_NAMES) {
+      this.removeEventListener(eventName, this.handleEvent);
+    }
+  }
+
+  handleEvent(event) {
+    try {
+      switch (event.type) {
+        case "row-select":
+          this.state = selectRow(this.state, event.detail.rowId);
+          break;
+        case "toggle-evaluation":
+          this.state = toggleEvaluation(this.state);
+          break;
+        case "reset-tree":
+          this.state = resetTree(this.state);
+          break;
+        case "recompute-tree":
+          this.state = forceRecompute(this.state);
+          break;
+        case "condition-edit":
+          this.state = updateNodeCondition(this.state, event.detail.nodeId, {
+            [event.detail.field]: event.detail.value
+          });
+          break;
+        case "add-split":
+          this.state = addSplitAtLeaf(this.state, event.detail.leafId);
+          break;
+        case "remove-split":
+          this.state = removeSplitNode(this.state, event.detail.nodeId);
+          break;
+        default:
+          return;
+      }
+
+      this.notice = "";
+      this.render();
+    } catch (error) {
+      this.notice = error instanceof Error ? error.message : "Unknown error";
+      this.render();
+    }
+  }
+
+  render() {
+    this.innerHTML = `
+      <div class="page-shell">
+        <header class="hero">
+          <p class="eyebrow">Interactive Lesson</p>
+          <h1>Build a tiny decision tree for row 8</h1>
+          <p class="hero-copy">
+            Edit binary rules with <strong>size</strong> and <strong>neighborhood</strong>,
+            route every housing row into a leaf, and watch how the prediction changes.
+          </p>
+        </header>
+
+        <control-bar></control-bar>
+
+        ${this.notice ? `<p class="status-banner" role="status">${this.notice}</p>` : ""}
+
+        <main class="layout-grid">
+          <section class="panel panel-left">
+            <dataset-table></dataset-table>
+          </section>
+
+          <section class="panel panel-center">
+            <tree-editor></tree-editor>
+          </section>
+
+          <section class="panel panel-right">
+            <prediction-panel></prediction-panel>
+            ${
+              this.state.ui.showEvaluation
+                ? `<evaluation-panel></evaluation-panel>`
+                : `<section class="subpanel muted-panel">
+                    <h2>Evaluation Hidden</h2>
+                    <p>Use the toggle above to compare your edited tree against the starter baseline.</p>
+                  </section>`
+            }
+          </section>
+        </main>
+      </div>
+    `;
+
+    this.querySelector("control-bar").state = this.state;
+    this.querySelector("dataset-table").state = this.state;
+    this.querySelector("tree-editor").state = this.state;
+    this.querySelector("prediction-panel").state = this.state;
+
+    if (this.state.ui.showEvaluation) {
+      this.querySelector("evaluation-panel").state = this.state;
+    }
+  }
+}
+
+customElements.define("app-root", AppRoot);

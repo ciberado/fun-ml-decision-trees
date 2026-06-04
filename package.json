@@ -1,0 +1,9 @@
+{
+  "name": "decisions",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "npx http-server --port 8080 --cors",
+    "test": "node --test"
+  }
+}
