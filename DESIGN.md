@@ -198,13 +198,14 @@ Each leaf predicts a class using majority vote over the known rows it contains.
 - if `Budget` rows are more numerous, predict `Budget`
 - if `Premium` rows are more numerous, predict `Premium`
 - if there is a tie, predict the global majority class of the training rows
+- if a leaf contains no known rows, predict the global majority class of the training rows
 
 For the provided dataset, the global majority is `Budget` because rows `1` through `7` contain:
 
 - `Budget`: `4`
 - `Premium`: `3`
 
-The UI should surface that a tie-break was used.
+The UI should surface when a global-majority fallback was used, whether due to a tie or an empty leaf.
 
 ### Evaluation
 - The app must evaluate the current tree on rows `1` through `7`.
@@ -257,6 +258,45 @@ The UI should surface that a tie-break was used.
 ### Adaptability
 - Mobile support is not required for MVP.
 - The layout and component structure should still make later responsive adaptation straightforward.
+
+## Quality Assurance And Testing
+
+### Testing Goals
+- Verify that tree logic is correct before relying on the UI.
+- Prevent invalid editor states.
+- Ensure the prediction for row `8` is reproducible from the visible rules.
+- Ensure evaluation metrics and baseline warnings remain trustworthy after edits.
+- Catch regressions in accessibility-critical behavior.
+
+### Required Test Levels
+- pure logic tests for routing, classification, and evaluation
+- integration tests for recomputation after tree edits
+- UI behavior tests for rendering and editor constraints
+- manual exploratory tests for classroom usability
+- accessibility checks for keyboard use and reduced motion
+
+### Minimum Acceptance Scenarios
+The MVP should not be considered complete unless these scenarios pass:
+
+1. The default starter tree routes all rows into deterministic leaves.
+2. Row `8` receives a predicted class from the starter tree.
+3. Editing a split condition recomputes row paths, leaf assignments, prediction, and evaluation.
+4. Adding a split to an allowed leaf updates the tree without violating the depth limit.
+5. Removing a split collapses the subtree into a valid leaf and recomputes correctly.
+6. The editor never offers `price`, `class`, or `price per m2` as split features.
+7. A tie inside a leaf applies the documented global-majority tie-break rule.
+8. Accuracy, false positives, and false negatives match the current tree state.
+9. Baseline warnings appear independently for worse accuracy, more false positives, and more false negatives.
+10. The app remains usable with keyboard interaction for row selection and split editing.
+
+### Regression Focus Areas
+- tree depth validation
+- feature and operator validation
+- leaf classification correctness
+- baseline comparison correctness
+- selected-row path rendering
+- row `8` visual distinction
+- display-only treatment of `Price` and `Price per m2`
 
 ## Information Architecture
 
