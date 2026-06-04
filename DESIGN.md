@@ -27,6 +27,7 @@ Can we use `size` and `neighborhood` to classify the target row as `Budget` or `
 - Let users freely edit the tree structure within safe limits.
 - Teach classification intuition, not training algorithms.
 - Keep the implementation simple, modular, and framework-free.
+- Let learners switch the interface between English, Spanish, and Catalan.
 
 ## Non-Goals
 - Training a real decision tree automatically.
@@ -98,7 +99,7 @@ The app should feel like an interactive lesson and a constrained tree editor at 
 
 ### Main Flow
 1. The user sees the dataset as both a table and a set of numbered balls.
-2. The user sees a starter tree that can be edited.
+2. The user sees a root bucket and builds the editable tree from there.
 3. The user changes split conditions and optionally adds or removes split nodes.
 4. The app recomputes the routing immediately.
 5. Balls move or relocate into the corresponding leaf buckets.
@@ -118,7 +119,7 @@ The following product decisions are now fixed for the first implementation.
 
 ### Core Product Shape
 - The app is a free-form tree editor with constraints, not only a guided demo.
-- It should still start with a prebuilt example tree so users are not dropped into an empty state.
+- The editable tree should start from a single root bucket so learners build the structure themselves.
 - The lesson focuses on manual routing and manual tree editing.
 - Automatic tree training is explicitly out of scope for MVP and can be introduced later.
 
@@ -129,13 +130,13 @@ The following product decisions are now fixed for the first implementation.
 - Users can edit the `feature`, `operator`, and `value` of each split.
 
 ### Default Starter Tree
-The app should load with a default starter tree rather than an empty canvas. For MVP, use this baseline:
+The app should keep a default starter tree as the evaluation baseline. For MVP, use this baseline:
 
 - root split: `neighborhood = B`
 - true branch split: `size <= 80`
 - false branch: leaf
 
-This starter tree is simple enough to understand immediately and useful enough to act as the baseline model for evaluation warnings.
+This starter tree is simple enough to understand immediately and useful enough to act as the hidden baseline model for evaluation warnings, even though the editable tree now starts from the root only.
 
 ### Explanation Strategy
 - The explanation panel should favor compact structured explanations over verbose prose.
@@ -154,6 +155,7 @@ This starter tree is simple enough to understand immediately and useful enough t
 ### Persistence
 - MVP is stateless across refreshes.
 - No saved sessions are required.
+- The selected UI language does not need to persist across refreshes in MVP.
 
 ### Dataset Editing
 - Users edit the tree only in MVP.
@@ -232,12 +234,11 @@ The UI should surface when a global-majority fallback was used, whether due to a
 - The warning should be informative, not punitive.
 
 ### Controls
-- Reset tree to starter version
-- Recompute current tree
+- Reset tree
 - Add split
 - Remove split
 - Select row
-- Toggle visibility of the evaluation panel if needed
+- Switch UI language between English, Spanish, and Catalan
 
 ## Non-Functional Requirements
 

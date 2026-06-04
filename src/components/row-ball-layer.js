@@ -1,3 +1,6 @@
+import { getMessages, translateClassLabel } from "../i18n/index.js";
+import { formatPrice, formatPricePerM2 } from "../utils/formatters.js";
+
 class RowBallLayer extends HTMLElement {
   set rows(value) {
     this._rows = value;
@@ -6,6 +9,11 @@ class RowBallLayer extends HTMLElement {
 
   set selectedRowId(value) {
     this._selectedRowId = value;
+    this.render();
+  }
+
+  set locale(value) {
+    this._locale = value;
     this.render();
   }
 
@@ -31,23 +39,26 @@ class RowBallLayer extends HTMLElement {
   }
 
   getTooltip(row) {
-    const price = row.price == null ? "?" : `€${row.price}`;
-    const label = row.label ?? "?";
-    const pricePerM2 =
-      row.price == null ? "?" : `€${(row.price / row.size).toFixed(2)}`;
+    const locale = this._locale ?? "en";
+    const messages = getMessages(locale);
+    const price = formatPrice(row.price, locale);
+    const label = translateClassLabel(row.label, locale);
+    const pricePerM2 = formatPricePerM2(row, locale);
 
     return [
-      `Row ${row.id}${row.isTarget ? " (target)" : ""}`,
-      `Class: ${label}`,
-      `Price: ${price}`,
-      `Size: ${row.size} m2`,
-      `Neighborhood: ${row.neighborhood}`,
-      `Price per m2: ${pricePerM2}`
+      row.isTarget ? messages.common.targetRow(row.id) : messages.common.row(row.id),
+      `${messages.rowTooltip.class}: ${label}`,
+      `${messages.rowTooltip.price}: ${price}`,
+      `${messages.rowTooltip.size}: ${messages.common.sizeValue(row.size)}`,
+      `${messages.rowTooltip.neighborhood}: ${row.neighborhood}`,
+      `${messages.rowTooltip.pricePerM2}: ${pricePerM2}`
     ].join("\n");
   }
 
   render() {
     const rows = this._rows ?? [];
+    const locale = this._locale ?? "en";
+    const messages = getMessages(locale);
 
     this.innerHTML = `
       <div class="ball-cluster">
@@ -68,7 +79,7 @@ class RowBallLayer extends HTMLElement {
                 type="button"
                 class="${classes}"
                 data-row-ball="${row.id}"
-                aria-label="Select row ${row.id}"
+                aria-label="${messages.common.selectRow(row.id)}"
                 title="${this.getTooltip(row)}"
               >
                 ${row.id}

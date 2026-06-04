@@ -1,3 +1,4 @@
+import { getMessages } from "../i18n/index.js";
 import "./tree-node.js";
 
 class TreeEditor extends HTMLElement {
@@ -11,14 +12,15 @@ class TreeEditor extends HTMLElement {
       return;
     }
 
+    const messages = getMessages(this._state.ui.locale);
+
     this.innerHTML = `
       <section class="subpanel">
         <div class="panel-heading">
           <div>
-            <p class="eyebrow">Tree Editor</p>
-            <h2>Process one ball at a time</h2>
+            <p class="eyebrow">${messages.treeEditor.title}</p>
           </div>
-          <p class="inline-hint">Add a split to a bucket, then use <strong>Play</strong> to move the next ball into the matching side.</p>
+          <p class="inline-hint">${messages.treeEditor.hint}</p>
         </div>
         <tree-node></tree-node>
       </section>
@@ -29,7 +31,9 @@ class TreeEditor extends HTMLElement {
       treeNode: this._state.tree,
       dataset: this._state.dataset,
       splitProgress: this._state.ui.splitProgress,
-      bucketLabel: "All rows",
+      rootBucketLabel: messages.treeEditor.allRows,
+      locale: this._state.ui.locale,
+      bucketLabel: "",
       selectedRowId: this._state.selectedRow.rowId,
       selectedLeafId: this._state.selectedRow.leafId
     };

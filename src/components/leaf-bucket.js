@@ -1,3 +1,4 @@
+import { getMessages, translateClassLabel } from "../i18n/index.js";
 import "./row-ball-layer.js";
 import { describeFallback } from "../utils/formatters.js";
 
@@ -33,7 +34,8 @@ class LeafBucket extends HTMLElement {
       return;
     }
 
-    const { node, detail, depth, maxDepth, selectedRowId } = this._data;
+    const { node, detail, depth, maxDepth, selectedRowId, locale = "en" } = this._data;
+    const messages = getMessages(locale);
     const canAdd = depth <= maxDepth;
     const bucketClass = [
       "leaf-bucket",
@@ -47,19 +49,19 @@ class LeafBucket extends HTMLElement {
       <section class="${bucketClass}">
         <div class="leaf-header">
           <div>
-            <p class="eyebrow">Leaf ${node.id}</p>
-            <h4>${detail.predictedLabel}</h4>
+            <p class="eyebrow">${messages.common.leaf(node.id)}</p>
+            <h4>${translateClassLabel(detail.predictedLabel, locale)}</h4>
           </div>
           ${
             canAdd
-              ? `<button type="button" class="mini-action" data-add-split="${node.id}">Add Split</button>`
-              : `<span class="mini-tag">Depth limit reached</span>`
+              ? `<button type="button" class="mini-action" data-add-split="${node.id}">${messages.treeEditor.addSplit}</button>`
+              : `<span class="mini-tag">${messages.leafBucket.depthLimitReached}</span>`
           }
         </div>
         <p class="leaf-meta">
-          Known rows: ${detail.knownRowIds.length} | Budget ${detail.counts.Budget} | Premium ${detail.counts.Premium}
+          ${messages.leafBucket.knownRowsSummary(detail.knownRowIds.length, detail.counts.Budget, detail.counts.Premium)}
         </p>
-        <p class="leaf-meta">${describeFallback(detail.fallbackReason)}</p>
+        <p class="leaf-meta">${describeFallback(detail.fallbackReason, locale)}</p>
         <row-ball-layer></row-ball-layer>
       </section>
     `;
@@ -67,6 +69,7 @@ class LeafBucket extends HTMLElement {
     const rowBallLayer = this.querySelector("row-ball-layer");
     rowBallLayer.rows = detail.rows;
     rowBallLayer.selectedRowId = selectedRowId;
+    rowBallLayer.locale = locale;
   }
 }
 

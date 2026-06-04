@@ -1,4 +1,5 @@
-import { FEATURE_CONFIG, FEATURE_OPTIONS } from "../domain/config.js";
+import { FEATURE_CONFIG } from "../domain/config.js";
+import { getMessages, translateClassLabel, translateFeatureLabel } from "../i18n/index.js";
 import { buildEditorFlow } from "../state/recompute.js";
 import "./row-ball-layer.js";
 
@@ -18,13 +19,13 @@ function invertOperator(operator) {
   return "=";
 }
 
-function formatConditionText(condition, negate = false) {
+function formatConditionText(condition, locale, negate = false) {
   const operator = negate ? invertOperator(condition.operator) : condition.operator;
-  return `${condition.feature} ${operator} ${condition.value}`;
+  return `${translateFeatureLabel(condition.feature, locale)} ${operator} ${condition.value}`;
 }
 
 function appendBucketLabel(prefix, conditionText) {
-  if (!prefix || prefix === "All rows") {
+  if (!prefix) {
     return conditionText;
   }
 
@@ -205,11 +206,13 @@ class TreeNode extends HTMLElement {
       return;
     }
 
-    const { flow, treeNode, dataset, bucketLabel, selectedRowId, selectedLeafId } = this._data;
+    const { flow, treeNode, dataset, bucketLabel, locale, selectedRowId, selectedLeafId } = this._data;
+    const messages = getMessages(locale);
+    const visibleBucketLabel = bucketLabel || this._data.rootBucketLabel || messages.treeEditor.allRows;
     const isSelectedLeaf = flow.type === "leaf" && flow.nodeId === selectedLeafId;
     const leafBadge =
       flow.type === "leaf" && flow.isSettled && flow.majorityLabel
-        ? `<span class="leaf-result-badge is-${flow.majorityLabel.toLowerCase()}">${flow.majorityLabel}</span>`
+        ? `<span class="leaf-result-badge is-${flow.majorityLabel.toLowerCase()}">${translateClassLabel(flow.majorityLabel, locale)}</span>`
         : "";
     const sourceCardClasses = [
       "stage-source-card",
@@ -225,7 +228,7 @@ class TreeNode extends HTMLElement {
           <div class="stage-source-main">
             <div class="stage-source-copy">
               <h3>
-                ${bucketLabel}
+                ${visibleBucketLabel}
                 ${leafBadge}
               </h3>
             </div>
@@ -235,7 +238,7 @@ class TreeNode extends HTMLElement {
                 class="stage-icon-button"
                 data-add-split="${treeNode.id}"
                 ${flow.type === "split" || !flow.canAddSplit ? "disabled" : ""}
-                aria-label="Add split to ${treeNode.id}"
+                aria-label="${messages.treeEditor.addSplitTo(treeNode.id)}"
               >
                 +
               </button>
@@ -244,7 +247,7 @@ class TreeNode extends HTMLElement {
                 class="stage-play-button"
                 data-play-node="${treeNode.id}"
                 ${flow.type !== "split" || !flow.canPlay ? "disabled" : ""}
-                aria-label="Process next ball"
+                aria-label="${messages.treeEditor.processNextBall}"
               >
                 &#9654;
               </button>
@@ -260,11 +263,11 @@ class TreeNode extends HTMLElement {
                 <div class="compact-split-row">
                   <label class="field compact-field">
                     <select class="field-input" data-node-id="${treeNode.id}" data-condition-field="feature">
-                      ${FEATURE_OPTIONS.map(
-                        (feature) =>
-                          `<option value="${feature.value}" ${
-                            feature.value === treeNode.condition.feature ? "selected" : ""
-                          }>${feature.label}</option>`
+                      ${Object.keys(FEATURE_CONFIG).map(
+                        (featureName) =>
+                          `<option value="${featureName}" ${
+                            featureName === treeNode.condition.feature ? "selected" : ""
+                          }>${translateFeatureLabel(featureName, locale)}</option>`
                       ).join("")}
                     </select>
                   </label>
@@ -278,7 +281,7 @@ class TreeNode extends HTMLElement {
                   ${renderValueControl(treeNode.id, treeNode.condition, dataset)}
 
                   <button type="button" class="mini-action danger compact-remove" data-remove-split="${treeNode.id}">
-                    Remove
+                    ${messages.treeEditor.remove}
                   </button>
                 </div>
               </div>
@@ -303,6 +306,7 @@ class TreeNode extends HTMLElement {
         ? flow.remainingRows
         : flow.rows;
     sourceLayer.selectedRowId = selectedRowId;
+    sourceLayer.locale = locale;
 
     if (flow.type === "split") {
       this.querySelector('[data-branch="true"]').data = this.renderChildData("true");
@@ -346,7 +350,7 @@ class TreeNode extends HTMLElement {
         treeNode: previewNode.trueBranch,
         bucketLabel: appendBucketLabel(
           this._data.bucketLabel,
-          formatConditionText(previewNode.condition)
+          formatConditionText(previewNode.condition, this._data.locale)
         )
       };
     }
@@ -358,7 +362,7 @@ class TreeNode extends HTMLElement {
         treeNode: previewNode.falseBranch,
         bucketLabel: appendBucketLabel(
           this._data.bucketLabel,
-          formatConditionText(previewNode.condition, true)
+          formatConditionText(previewNode.condition, this._data.locale, true)
         )
       };
     }
@@ -370,7 +374,7 @@ class TreeNode extends HTMLElement {
     const nextTreeNode = isTrueBranch ? this._data.treeNode.trueBranch : this._data.treeNode.falseBranch;
     const nextLabel = appendBucketLabel(
       this._data.bucketLabel,
-      formatConditionText(this._data.treeNode.condition, !isTrueBranch)
+      formatConditionText(this._data.treeNode.condition, this._data.locale, !isTrueBranch)
     );
 
     return {

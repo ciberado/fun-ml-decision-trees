@@ -9,6 +9,7 @@ The architecture should separate:
 - application state
 - rendering
 - user interaction
+- localization
 
 ## Required Technology
 
@@ -102,6 +103,11 @@ UI events mutate source state only. After any valid mutation:
     state/
       app-state.js
       recompute.js
+    i18n/
+      en.js
+      es.js
+      ca.js
+      index.js
     data/
       dataset.js
       starter-tree.js
@@ -189,6 +195,7 @@ Source state is the minimal state the user can change directly:
 - current tree
 - selected row
 - panel visibility
+- current UI language
 
 Dataset and baseline tree are fixed in MVP.
 
@@ -257,7 +264,9 @@ After any valid tree edit:
 - renders baseline warnings
 
 ### `control-bar`
-- reset to starter tree
+- reset control
+- language selector
+- summary metrics
 - recompute if explicit recompute remains in the UI
 - show or hide panels if needed
 

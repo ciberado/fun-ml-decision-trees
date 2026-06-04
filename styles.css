@@ -128,6 +128,27 @@ select {
   gap: 10px;
 }
 
+.locale-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid rgba(121, 96, 52, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.locale-picker-label {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.locale-select {
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+
 .action-button,
 .row-select-button,
 .mini-action {
@@ -307,6 +328,10 @@ select {
   margin-top: 18px;
 }
 
+tree-node {
+  display: block;
+}
+
 .node-card {
   padding: 18px;
   background: linear-gradient(180deg, rgba(255, 251, 241, 0.98), rgba(247, 240, 221, 0.98));
@@ -319,6 +344,8 @@ select {
 }
 
 .stage-node {
+  --connector-color: rgba(95, 111, 120, 0.42);
+  --branch-gap: 12px;
   margin-top: 18px;
 }
 
@@ -417,7 +444,19 @@ select {
 
 .stage-split-card {
   margin-top: 8px;
+  position: relative;
   padding: 10px 12px;
+}
+
+.stage-split-card::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  width: 2px;
+  height: 14px;
+  transform: translateX(-50%);
+  background: var(--connector-color);
 }
 
 .compact-split-row {
@@ -457,24 +496,42 @@ select {
 }
 
 .stage-branch-grid {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 10px;
+  gap: var(--branch-gap);
+  margin-top: 0;
+  padding-top: 14px;
+}
+
+.stage-branch-grid::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: calc(25% - (var(--branch-gap) / 4));
+  right: calc(25% - (var(--branch-gap) / 4));
+  height: 2px;
+  background: var(--connector-color);
 }
 
 .stage-branch {
   position: relative;
-  padding-top: 10px;
+  padding-top: 16px;
 }
 
 .stage-branch::before {
   content: "";
   position: absolute;
   top: 0;
-  left: 20px;
-  right: 20px;
-  border-top: 2px dashed rgba(95, 111, 120, 0.34);
+  left: 50%;
+  width: 2px;
+  height: 16px;
+  transform: translateX(-50%);
+  background: var(--connector-color);
+}
+
+.stage-branch > tree-node > .stage-node {
+  margin-top: 0;
 }
 
 .node-head,
@@ -647,6 +704,20 @@ select {
 
   .stage-source-main {
     display: grid;
+  }
+
+  .stage-branch-grid {
+    padding-top: 0;
+  }
+
+  .stage-split-card::after,
+  .stage-branch-grid::after,
+  .stage-branch::before {
+    display: none;
+  }
+
+  .stage-branch {
+    padding-top: 0;
   }
 
   .stage-source-actions {

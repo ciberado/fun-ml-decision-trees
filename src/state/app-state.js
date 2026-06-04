@@ -2,6 +2,7 @@ import { DATASET, getTargetRowId } from "../data/dataset.js";
 import { STARTER_TREE } from "../data/starter-tree.js";
 import { makeDefaultSplit, makeLeaf, findNodeById, getSplitDepthForLeafPath, normalizeCondition, replaceNodeAtPath, validateTree, cloneTree, collectNodeIds } from "../domain/tree-utils.js";
 import { MAX_TREE_DEPTH } from "../domain/config.js";
+import { detectInitialLocale, resolveLocale } from "../i18n/index.js";
 import { recomputeDerivedState } from "./recompute.js";
 import { createNodeId } from "../utils/ids.js";
 
@@ -20,6 +21,7 @@ export function createInitialState() {
     baselineTree: structuredClone(STARTER_TREE),
     tree: makeLeaf("root"),
     ui: {
+      locale: detectInitialLocale(),
       selectedRowId: getTargetRowId(dataset),
       showEvaluation: true,
       splitProgress: {}
@@ -35,6 +37,16 @@ export function selectRow(state, rowId) {
       selectedRowId: Number(rowId)
     }
   });
+}
+
+export function setLocale(state, locale) {
+  return {
+    ...state,
+    ui: {
+      ...state.ui,
+      locale: resolveLocale(locale)
+    }
+  };
 }
 
 export function toggleEvaluation(state) {
@@ -53,6 +65,7 @@ export function resetTree(state) {
     tree: makeLeaf("root"),
     ui: {
       ...state.ui,
+      locale: resolveLocale(state.ui.locale),
       selectedRowId: getTargetRowId(state.dataset),
       splitProgress: {}
     }

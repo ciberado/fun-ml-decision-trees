@@ -1,3 +1,4 @@
+import { getMessages, translateClassLabel } from "../i18n/index.js";
 import { formatPrice, formatPricePerM2 } from "../utils/formatters.js";
 
 class DatasetTable extends HTMLElement {
@@ -35,13 +36,14 @@ class DatasetTable extends HTMLElement {
       return;
     }
 
-    const { dataset, selectedRow } = this._state;
+    const { dataset, selectedRow, ui } = this._state;
+    const messages = getMessages(ui.locale);
 
     this.innerHTML = `
       <section class="subpanel">
         <div class="panel-heading">
           <div>
-            <p class="eyebrow">Dataset</p>
+            <p class="eyebrow">${messages.dataset.title}</p>
           </div>
         </div>
 
@@ -49,12 +51,12 @@ class DatasetTable extends HTMLElement {
           <table class="dataset-table">
             <thead>
               <tr>
-                <th scope="col">Select</th>
-                <th scope="col">Price</th>
-                <th scope="col">Class</th>
-                <th scope="col">Size</th>
-                <th scope="col">Neighborhood</th>
-                <th scope="col">€/m2</th>
+                <th scope="col">${messages.dataset.select}</th>
+                <th scope="col">${messages.dataset.price}</th>
+                <th scope="col">${messages.dataset.class}</th>
+                <th scope="col">${messages.dataset.size}</th>
+                <th scope="col">${messages.dataset.neighborhood}</th>
+                <th scope="col">${messages.dataset.pricePerM2}</th>
               </tr>
             </thead>
             <tbody>
@@ -70,15 +72,15 @@ class DatasetTable extends HTMLElement {
                   return `
                     <tr class="${rowClass}" data-row-id="${row.id}">
                       <td>
-                        <button type="button" class="row-select-button" data-row-select="${row.id}">
+                        <button type="button" class="row-select-button" data-row-select="${row.id}" aria-label="${messages.common.selectRow(row.id)}">
                           ${row.id}
                         </button>
                       </td>
-                      <td>${formatPrice(row.price)}</td>
-                      <td>${row.label ?? "?"}</td>
-                      <td>${row.size} m2</td>
+                      <td>${formatPrice(row.price, ui.locale)}</td>
+                      <td>${translateClassLabel(row.label, ui.locale)}</td>
+                      <td>${messages.common.sizeValue(row.size)}</td>
                       <td>${row.neighborhood}</td>
-                      <td>${formatPricePerM2(row)}</td>
+                      <td>${formatPricePerM2(row, ui.locale)}</td>
                     </tr>
                   `;
                 })

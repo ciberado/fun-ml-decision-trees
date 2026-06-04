@@ -6,13 +6,16 @@ import {
   removeSplitNode,
   resetTree,
   selectRow,
+  setLocale,
   updateNodeCondition
 } from "../state/app-state.js";
+import { getMessages } from "../i18n/index.js";
 import "./control-bar.js";
 import "./dataset-table.js";
 import "./tree-editor.js";
 
 const EVENT_NAMES = [
+  "locale-change",
   "row-select",
   "reset-tree",
   "preview-condition",
@@ -55,6 +58,9 @@ class AppRoot extends HTMLElement {
   handleEvent(event) {
     try {
       switch (event.type) {
+        case "locale-change":
+          this.state = setLocale(this.state, event.detail.locale);
+          break;
         case "row-select":
           this.state = selectRow(this.state, event.detail.rowId);
           break;
@@ -89,23 +95,22 @@ class AppRoot extends HTMLElement {
       this.notice = "";
       this.render();
     } catch (error) {
-      this.notice = error instanceof Error ? error.message : "Unknown error";
+      this.notice =
+        error instanceof Error ? error.message : getMessages(this.state.ui.locale).status.unknownError;
       this.render();
     }
   }
 
   render() {
     const targetRowId = this.state.prediction.targetRowId;
+    const messages = getMessages(this.state.ui.locale);
 
     this.innerHTML = `
       <div class="page-shell">
         <header class="hero">
-          <p class="eyebrow">Interactive Lesson</p>
-          <h1>Build a tiny decision tree for row ${targetRowId}</h1>
-          <p class="hero-copy">
-            Edit binary rules with <strong>size</strong> and <strong>neighborhood</strong>,
-            route every housing row into a leaf, and watch how the prediction changes.
-          </p>
+          <p class="eyebrow">${messages.hero.eyebrow}</p>
+          <h1>${messages.hero.title(targetRowId)}</h1>
+          <p class="hero-copy">${messages.hero.copy}</p>
         </header>
 
         <control-bar></control-bar>
