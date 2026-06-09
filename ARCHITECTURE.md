@@ -56,6 +56,7 @@ The architecture should not depend on any of these to function in production.
 Pure logic for:
 
 - calculating the average-price baseline model
+- training a small generated decision tree
 - evaluating one split against one row
 - routing a row through a tree
 - assigning all rows to leaves
@@ -85,6 +86,14 @@ The average-price lesson keeps its own local UI state because it does not need t
 - current UI language
 - whether `price per m2` has been engineered
 - current average-price result, if any
+
+The generated-tree lesson also keeps local UI state. Its source state is:
+
+- selected row
+- current UI language
+- current generated model, if any
+
+Its generated model is derived by training on known rows only, routing the full dataset through the trained tree, and evaluating known-row accuracy.
 
 ### 3. Presentation Layer
 Web Components render the current state into:
@@ -126,8 +135,9 @@ UI events mutate source state only. After any valid mutation:
       dataset.js
       starter-tree.js
     domain/
-      average-price-model.js
-      evaluate-condition.js
+    average-price-model.js
+    train-decision-tree.js
+    evaluate-condition.js
       route-row.js
       route-all-rows.js
       classify-leaf.js

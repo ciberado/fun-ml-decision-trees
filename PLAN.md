@@ -7,6 +7,8 @@ The plan below assumes the current `DESIGN.md` is the source of truth.
 
 The scope has expanded from one decision-tree lesson to a sequence of lessons. The first added lesson introduces a deliberately crude average-price model before learners move to the decision-tree editor. Navigation between lessons remains a later integration step.
 
+The sequence now also includes a generated decision-tree lesson after the manual tree editor. It introduces a small training algorithm without changing the static, framework-free runtime model.
+
 ## Lesson 1: Average Price Model
 
 ### Goal
@@ -177,6 +179,30 @@ Stabilize the app for actual use.
 - reduced-motion manual pass
 - visual regression pass on the starter tree and at least two edited trees
 - manual exploratory pass focused on classroom readability and confusion points
+
+## Lesson 3: Generated Decision Tree
+
+### Goal
+Show that the split configuration used by a decision tree can be found automatically by a machine learning algorithm.
+
+### Current Deliverables
+- separate static page at `lesson-trained-tree.html`
+- pure CART-style trainer using Gini impurity reduction
+- fixed max depth of `2` for the lesson
+- read-only generated tree revealed one split at a time
+- first generated state with all rows together before the root split
+- target row held outside the partial tree until the final generated model is complete
+- pending row groups for unrevealed splits
+- current-step candidate split score visualization
+- target-row prediction and generated-model evaluation
+- localized English, Spanish, and Catalan copy
+
+### Test Gate
+- unit tests for the trained split structure
+- unit tests proving the generated model classifies all known rows in the current fixture
+- manual or Playwright check that `Generate model` produces the split-score cards and read-only tree
+- manual or Playwright check for desktop and mobile layout
+- manual or Playwright check for the relevant language switch
 
 ## Phase 6: Later Enhancements
 

@@ -321,6 +321,14 @@ select {
   align-items: stretch;
 }
 
+.trained-lesson-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-top: 18px;
+  align-items: start;
+}
+
 .subpanel {
   padding: 24px;
 }
@@ -508,6 +516,9 @@ select {
 .detail-card,
 .metric-card,
 .leaf-bucket,
+.trained-leaf,
+.trained-split-card,
+.training-step-card,
 .node-card,
 .muted-panel {
   border: 1px solid rgba(121, 96, 52, 0.15);
@@ -855,6 +866,10 @@ tree-node {
   background: var(--selected-soft);
 }
 
+row-ball-layer {
+  display: block;
+}
+
 .member-block,
 .list-block,
 .warning-stack {
@@ -882,13 +897,259 @@ tree-node {
   background: rgba(255, 255, 255, 0.65);
 }
 
+.trained-placeholder-panel {
+  min-height: 20rem;
+}
+
+.trained-placeholder-panel .muted-panel {
+  min-height: 12rem;
+}
+
+.trained-steps-panel {
+  position: static;
+}
+
+.training-step-list {
+  display: grid;
+  gap: 14px;
+}
+
+.training-step-card {
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.step-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.training-step-card h3,
+.trained-split-card h3 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.training-step-head {
+  margin-bottom: 14px;
+}
+
+.candidate-table {
+  display: grid;
+  gap: 8px;
+}
+
+.candidate-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(80px, 0.4fr) auto;
+  gap: 10px;
+  padding: 0 10px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.candidate-header span:last-child {
+  min-width: 3.4rem;
+  text-align: right;
+}
+
+.candidate-list {
+  display: grid;
+  gap: 8px;
+  max-height: 18rem;
+  overflow: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.candidate-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(80px, 0.4fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: rgba(246, 239, 226, 0.62);
+}
+
+.candidate-row.is-best {
+  background: rgba(217, 244, 230, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(37, 108, 77, 0.22);
+}
+
+.candidate-main {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.candidate-condition {
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.candidate-meter {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(95, 111, 120, 0.15);
+}
+
+.candidate-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #227c70;
+}
+
+.candidate-score {
+  min-width: 3.4rem;
+  font-size: 0.86rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.compact-metric {
+  min-width: 9rem;
+}
+
+.trained-model-panel.is-generated {
+  min-height: 61rem;
+}
+
+.trained-tree-shell {
+  --trained-node-min-height: 11.5rem;
+  --trained-ball-space: 3.25rem;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.target-waiting-row {
+  margin-bottom: 16px;
+}
+
+.trained-tree-node {
+  min-width: 0;
+}
+
+.trained-split-card {
+  position: relative;
+  display: flex;
+  min-height: var(--trained-node-min-height);
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(255, 251, 241, 0.98), rgba(247, 240, 221, 0.98));
+}
+
+.trained-split-card::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -16px;
+  width: 2px;
+  height: 16px;
+  transform: translateX(-50%);
+  background: rgba(95, 111, 120, 0.42);
+}
+
+.trained-branch-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(15rem, 1fr));
+  gap: 14px;
+  padding-top: 16px;
+}
+
+.trained-branch-grid::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 25%;
+  right: 25%;
+  height: 2px;
+  background: rgba(95, 111, 120, 0.42);
+}
+
+.trained-branch {
+  position: relative;
+  padding-top: 20px;
+}
+
+.trained-branch::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 20px;
+  transform: translateX(-50%);
+  background: rgba(95, 111, 120, 0.42);
+}
+
+.trained-branch-label {
+  width: fit-content;
+  margin: 0 auto 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(121, 96, 52, 0.15);
+}
+
+.trained-leaf {
+  display: flex;
+  min-height: var(--trained-node-min-height);
+  flex-direction: column;
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(245, 238, 220, 0.95));
+}
+
+.trained-pending-group {
+  display: flex;
+  min-height: var(--trained-node-min-height);
+  flex-direction: column;
+  padding: 16px;
+  border: 1px dashed rgba(95, 111, 120, 0.35);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.trained-leaf row-ball-layer,
+.trained-pending-group row-ball-layer {
+  min-height: var(--trained-ball-space);
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.trained-leaf.contains-target,
+.trained-pending-group.contains-target {
+  background: linear-gradient(180deg, rgba(255, 238, 230, 0.96), rgba(255, 252, 245, 0.92));
+}
+
+.trained-evaluation-grid {
+  margin-top: 18px;
+}
+
 @media (max-width: 1180px) {
   .layout-grid,
-  .lesson-grid {
+  .lesson-grid,
+  .trained-lesson-grid {
     grid-template-columns: 1fr;
   }
 
-  .lesson-result-shell {
+  .lesson-result-shell,
+  .trained-steps-panel {
     position: static;
     display: block;
   }
@@ -918,12 +1179,18 @@ tree-node {
     align-items: start;
   }
 
+  .trained-model-panel.is-generated {
+    min-height: 127rem;
+  }
+
   .stage-source-main,
   .field-grid,
   .metric-grid,
   .result-metric-grid,
   .branch-grid,
-  .stage-branch-grid {
+  .stage-branch-grid,
+  .candidate-row,
+  .trained-branch-grid {
     grid-template-columns: 1fr;
   }
 
@@ -936,13 +1203,21 @@ tree-node {
   }
 
   .stage-split-card::after,
+  .trained-split-card::after,
+  .trained-branch-grid::after,
+  .trained-branch::before,
   .stage-branch-grid::after,
   .stage-branch::before {
     display: none;
   }
 
-  .stage-branch {
+  .stage-branch,
+  .trained-branch {
     padding-top: 0;
+  }
+
+  .candidate-score {
+    text-align: left;
   }
 
   .stage-source-actions {

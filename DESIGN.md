@@ -3,7 +3,7 @@
 ## Summary
 Build a small web application in vanilla JavaScript with Web Components that teaches simple prediction models through a tiny housing dataset. The app should feel like a classroom exercise: visual, concrete, easy to manipulate, and easy to understand without advanced math or machine learning background.
 
-The lessons should progress from the simplest possible model toward a manual decision tree. Lesson 1 uses one crude average price per m2 to extrapolate the target apartment price. The decision-tree lesson then represents each dataset row as a small ball labeled with its row number, lets users create and modify a binary decision tree, and shows how balls flow through branch conditions into leaf buckets.
+The lessons should progress from the simplest possible model toward a manual decision tree, then to a generated decision tree. Lesson 1 uses one crude average price per m2 to extrapolate the target apartment price. The decision-tree lesson then represents each dataset row as a small ball labeled with its row number, lets users create and modify a binary decision tree, and shows how balls flow through branch conditions into leaf buckets. The generated-tree lesson shows how a small training algorithm can choose split rules automatically.
 
 ## Problem Statement
 Introductory explanations of machine learning often become abstract too early. Learners hear terms like "feature", "split", "leaf", and "prediction" before they see a concrete example they can reason about.
@@ -26,14 +26,13 @@ Can we use `size` and `neighborhood` to classify the target row as `Budget` or `
 - Keep all data points visible at all times.
 - Make the effect of each split immediately visible.
 - Let users freely edit the tree structure within safe limits.
-- Teach classification intuition, not training algorithms.
+- Teach classification intuition before introducing a small training algorithm.
 - Keep the implementation simple, modular, and framework-free.
 - Let learners switch the interface between English, Spanish, and Catalan.
 
 ## Non-Goals
-- Training a real decision tree automatically.
 - Supporting large datasets.
-- Explaining entropy, Gini impurity, pruning, or overfitting in depth.
+- Explaining entropy, pruning, or overfitting in depth.
 - Turning the app into a generic ML tool.
 - Persisting complex user work across sessions in MVP.
 
@@ -121,6 +120,19 @@ The app should feel like an interactive lesson and a constrained tree editor at 
 7. The app evaluates the current tree on the known rows.
 8. The app warns if the current tree performs worse than the starter tree baseline.
 
+### Generated Tree Flow
+1. The user opens a separate lesson after the manual decision-tree page.
+2. The user triggers a `Generate model` action.
+3. The app trains a small read-only classification tree from known rows only.
+4. The app scores binary candidate splits with Gini impurity reduction.
+5. The first generated-model state shows all row balls together before any split is applied.
+6. The app reveals the generated tree step by step, one chosen split at a time.
+7. Unrevealed child groups remain visible as pending row buckets until their split is shown.
+8. The target row waits outside the partial tree and only routes into a leaf once the generated model is complete.
+9. The app shows the chosen split for the current training step and a compact candidate-score comparison.
+10. The generated tree routes the target row and known rows into leaf buckets.
+11. The app shows the target prediction and evaluation metrics for the generated model.
+
 ### Interaction Principles
 - Every edit must produce immediate visible feedback.
 - The tree must stay readable for beginners.
@@ -138,6 +150,7 @@ The following product decisions are now fixed for the first implementation.
 - The editable tree should start from a single root bucket so learners build the structure themselves.
 - The lesson focuses on manual routing and manual tree editing.
 - Automatic tree training is explicitly out of scope for MVP and can be introduced later.
+- Automatic tree training now belongs to its own follow-up lesson, separate from the manual tree editor.
 
 ### Tree Constraints
 - The tree is binary only.
