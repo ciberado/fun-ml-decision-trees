@@ -5,6 +5,28 @@ This project should be delivered in small phases. Each phase should leave the ap
 
 The plan below assumes the current `DESIGN.md` is the source of truth.
 
+The scope has expanded from one decision-tree lesson to a sequence of lessons. The first added lesson introduces a deliberately crude average-price model before learners move to the decision-tree editor. Navigation between lessons remains a later integration step.
+
+## Lesson 1: Average Price Model
+
+### Goal
+Teach that a model can be a simple calculation before introducing machine learning.
+
+### Current Deliverables
+- separate static page at `lesson-average-price.html`
+- shared dataset table
+- feature-engineering action that reveals `price per m2`
+- extrapolation action that estimates the target price
+- class verdict using the fixed `250` threshold
+- localized English, Spanish, and Catalan copy
+
+### Test Gate
+- unit tests for `average-price-model`
+- manual or Playwright check that extrapolation is disabled before feature engineering
+- manual or Playwright check that `price per m2` is hidden before feature engineering and visible after it
+- manual or Playwright check that desktop result and dataset panels stay equal height when side by side
+- manual or Playwright check that long localized button labels fit on mobile
+
 ## Phase 0: Foundation
 
 ### Goal
@@ -162,6 +184,8 @@ Stabilize the app for actual use.
 Extend the app after the MVP is stable.
 
 ### Candidate Work
+- lesson navigation between the average-price page and the decision-tree page
+- shared lesson shell if future lessons repeat the same controls and layout
 - richer animation
 - step-by-step playback mode
 - dataset editing
@@ -189,6 +213,8 @@ Extend the app after the MVP is stable.
 ### Unit Test Scope
 Pure logic should be tested first and kept deterministic:
 
+- calculate average price per m2 from known rows
+- extrapolate the target price and classify it using the fixed price threshold
 - evaluate one condition against one row
 - route one row through a tree
 - route all rows through a tree

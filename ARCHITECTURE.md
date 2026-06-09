@@ -3,8 +3,11 @@
 ## Overview
 This application is a client-side educational web app. It should run entirely in the browser, use no frontend framework, and keep the logic simple enough to inspect and maintain.
 
+The app can contain multiple static lesson pages that share the same dataset, styles, localization catalog, and pure domain helpers. Navigation between lessons can be added later without changing the individual lesson entry points.
+
 The architecture should separate:
 
+- lesson-specific model logic
 - decision-tree logic
 - application state
 - rendering
@@ -52,6 +55,7 @@ The architecture should not depend on any of these to function in production.
 ### 1. Domain Layer
 Pure logic for:
 
+- calculating the average-price baseline model
 - evaluating one split against one row
 - routing a row through a tree
 - assigning all rows to leaves
@@ -63,7 +67,7 @@ Pure logic for:
 This layer should have no DOM access.
 
 ### 2. State Layer
-Single application state object containing:
+The decision-tree lesson uses a single application state object containing:
 
 - dataset
 - baseline tree
@@ -75,9 +79,17 @@ Single application state object containing:
 
 This layer coordinates recomputation after user edits.
 
+The average-price lesson keeps its own local UI state because it does not need tree routing or shared recomputation. Its source state is:
+
+- selected row
+- current UI language
+- whether `price per m2` has been engineered
+- current average-price result, if any
+
 ### 3. Presentation Layer
 Web Components render the current state into:
 
+- average-price lesson
 - dataset table
 - row balls
 - tree editor
@@ -97,9 +109,11 @@ UI events mutate source state only. After any valid mutation:
 ```text
 /
   index.html
+  lesson-average-price.html
   styles.css
   src/
     main.js
+    average-price-main.js
     state/
       app-state.js
       recompute.js
@@ -112,6 +126,7 @@ UI events mutate source state only. After any valid mutation:
       dataset.js
       starter-tree.js
     domain/
+      average-price-model.js
       evaluate-condition.js
       route-row.js
       route-all-rows.js
@@ -120,6 +135,7 @@ UI events mutate source state only. After any valid mutation:
       compare-baseline.js
     components/
       app-root.js
+      average-price-lesson.js
       control-bar.js
       dataset-table.js
       row-ball-layer.js
@@ -229,8 +245,17 @@ After any valid tree edit:
 - wires events to recomputation
 - passes state down to child components
 
+### `average-price-lesson`
+- owns the first lesson's local UI state
+- renders the shared dataset table
+- hides `price per m2` values until the feature-engineering action runs
+- enables extrapolation only after feature engineering
+- triggers the average-price extrapolation
+- renders the calculated estimate and class verdict, with the verdict as the final result block
+
 ### `dataset-table`
 - renders rows and display-only fields
+- can hide or reveal `price per m2` values through UI state
 - highlights selected row
 - emits row selection events
 
@@ -323,6 +348,7 @@ The editor must enforce:
 ### Unit Test Scope
 Priority should go to pure domain functions:
 
+- `average-price-model`
 - `evaluate-condition`
 - `route-row`
 - `route-all-rows`

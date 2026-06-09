@@ -1,9 +1,9 @@
-# Decision Tree Teaching App Design
+# Decision Lessons Teaching App Design
 
 ## Summary
-Build a small web application in vanilla JavaScript with Web Components that teaches the basic idea of a decision tree through a tiny housing dataset. The app should feel like a classroom exercise: visual, concrete, easy to manipulate, and easy to understand without advanced math or machine learning background.
+Build a small web application in vanilla JavaScript with Web Components that teaches simple prediction models through a tiny housing dataset. The app should feel like a classroom exercise: visual, concrete, easy to manipulate, and easy to understand without advanced math or machine learning background.
 
-Each dataset row is represented as a small ball labeled with its row number. Users create and modify a binary decision tree, then watch the balls flow through its branch conditions into leaf buckets. The main learning objective is to understand how a decision tree classifies an unknown row by repeatedly applying simple human-readable rules.
+The lessons should progress from the simplest possible model toward a manual decision tree. Lesson 1 uses one crude average price per m2 to extrapolate the target apartment price. The decision-tree lesson then represents each dataset row as a small ball labeled with its row number, lets users create and modify a binary decision tree, and shows how balls flow through branch conditions into leaf buckets.
 
 ## Problem Statement
 Introductory explanations of machine learning often become abstract too early. Learners hear terms like "feature", "split", "leaf", and "prediction" before they see a concrete example they can reason about.
@@ -21,6 +21,7 @@ The core teaching question is:
 Can we use `size` and `neighborhood` to classify the target row as `Budget` or `Premium` by routing it through a small set of simple binary rules?
 
 ## Product Goals
+- Introduce the idea of a model before introducing machine learning.
 - Make decision trees understandable in a few minutes.
 - Keep all data points visible at all times.
 - Make the effect of each split immediately visible.
@@ -44,6 +45,8 @@ Can we use `size` and `neighborhood` to classify the target row as `Budget` or `
 ## Success Criteria
 The design is successful if a first-time user can:
 
+- explain that a simple calculation can be a prediction model
+- create and use a derived `price per m2` feature
 - identify the features available to the tree
 - explain what a split does
 - follow one row through the tree without confusion
@@ -84,7 +87,7 @@ For the lesson, `Price` is the known real-world outcome for rows `2` through `15
 - The current target row, row `1`, is small and in neighborhood `B`, so it still invites discussion instead of feeling automatic.
 
 ### Important Constraint
-`price` and `price per m2` are visible in the table, but they must not be used as split features in MVP. The target row has unknown price, so allowing those derived values as split inputs would make the exercise logically invalid.
+`price` and `price per m2` are display-only values and must not be used as split features in MVP. Lesson 1 initially hides `price per m2` until the feature-engineering action runs; the decision-tree lesson can show it directly as a display-only field. The target row has unknown price, so allowing those derived values as split inputs would make the tree exercise logically invalid.
 
 ## Learning Model
 The app teaches classification, not regression.
@@ -96,6 +99,17 @@ The app teaches classification, not regression.
 
 ## Experience Overview
 The app should feel like an interactive lesson and a constrained tree editor at the same time.
+
+### Lesson 1: Average Price Model
+1. The user sees the same housing dataset table.
+2. The user triggers a "Feature engineering" action to create the `price per m2` column from known prices and sizes.
+3. The user triggers an "Extrapolate price" action.
+4. The app calculates the average `price per m2` from known rows.
+5. The app multiplies that average by the target apartment size.
+6. The app classifies the estimate using the documented price boundary:
+   - `Budget`: `price <= 250`
+   - `Premium`: `price > 250`
+7. The app explains that this is a prediction model, but not machine learning because nothing is trained or optimized.
 
 ### Main Flow
 1. The user sees the dataset as both a table and a set of numbered balls.
@@ -118,6 +132,8 @@ The app should feel like an interactive lesson and a constrained tree editor at 
 The following product decisions are now fixed for the first implementation.
 
 ### Core Product Shape
+- The app is a sequence of lesson pages, with lesson navigation to be added later.
+- Lesson 1 introduces a non-ML prediction model through feature engineering and averaging.
 - The app is a free-form tree editor with constraints, not only a guided demo.
 - The editable tree should start from a single root bucket so learners build the structure themselves.
 - The lesson focuses on manual routing and manual tree editing.
@@ -162,6 +178,22 @@ This starter tree is simple enough to understand immediately and useful enough t
 - Dataset editing belongs to a later phase.
 
 ## Functional Requirements
+
+### Average Price Lesson
+- Provide a separate first lesson page before the decision-tree lesson is wired into navigation.
+- Show the full dataset table with the same visual treatment as the decision-tree lesson.
+- Provide a prominent intermediate action after the dataset table: `Feature engineering`.
+- Hide the calculated `price per m2` values until the feature-engineering action runs.
+- Disable `Extrapolate price` until feature engineering has run.
+- Provide the next action after feature engineering: `Extrapolate price`.
+- On action, compute:
+  - average known `price per m2`
+  - target estimated price as `average price per m2 * target size`
+  - predicted class using the fixed `250` price threshold
+- Show the result beside the dataset on desktop and below it on narrow screens.
+- When the dataset and result are side by side, keep the result panel the same height as the dataset/action panel.
+- Put the verdict as the final block in the result panel.
+- Keep the lesson localized in English, Spanish, and Catalan.
 
 ### Dataset Presentation
 - Show the full dataset in a compact table.
@@ -309,11 +341,18 @@ The MVP should not be considered complete unless these scenarios pass:
 ## Information Architecture
 
 ### Default Layout
-Use a three-panel layout:
+The decision-tree lesson uses a three-panel layout:
 
 - left: dataset table and selected-row details
 - center: tree editor and leaf buckets
 - right: prediction and evaluation panel
+
+The average-price lesson uses a two-column layout on wide screens:
+
+- left: dataset table and lesson actions
+- right: result panel
+
+On narrow screens, the average-price lesson stacks the result below the dataset and actions.
 
 ### Small-Screen Layout
 For future responsive adaptation, sections should stack in this order:
