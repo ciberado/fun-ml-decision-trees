@@ -30,12 +30,16 @@ export function formatPricePerM2(row, locale = "en") {
     return getMessages(locale).common.unknown;
   }
 
+  return formatPricePerM2Value(row.price / row.size, locale);
+}
+
+export function formatPricePerM2Value(value, locale = "en") {
   return new Intl.NumberFormat(getMessages(locale).meta.intlLocale, {
     style: "currency",
     currency: "EUR",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  }).format(row.price / row.size);
+  }).format(value);
 }
 
 export function describeFallback(reason, locale = "en") {

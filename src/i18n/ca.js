@@ -29,6 +29,40 @@ export const ca = {
     qrButtonLabel: "Obre el codi QR",
     qrDialogLabel: "Modal del codi QR"
   },
+  averageLesson: {
+    eyebrow: "Lliçó 1",
+    title: "Endevina amb una mitjana",
+    copy:
+      "Comença amb el model més simple possible: calcula la mitjana dels preus coneguts per m², extrapola el preu de l'habitatge objectiu i aplica la frontera Econòmic/Premium.",
+    summaryLabel: "Resum del model de preu mitjà",
+    target: "Objectiu",
+    knownRows: (count) => `${count} files conegudes`,
+    notCalculated: "Encara no hi ha estimació",
+    featureMissing: "Característica sense crear",
+    featureReady: "Característica €/m² a punt",
+    averagePricePerM2: "Mitjana €/m²",
+    verdict: "Veredicte",
+    resultTitle: "Resultat",
+    placeholderTitle: "Esperant estimació",
+    placeholderCopy: "Usa l'acció d'extrapolar per calcular una estimació de preu per a l'habitatge objectiu.",
+    featurePlaceholderCopy: "Comença creant una característica €/m² a partir del preu i la mida de cada habitatge conegut.",
+    predictedAs: (rowId, label) => `Fila ${rowId}: ${label}`,
+    thresholdRule: (threshold) => `Premium si l'estimació és superior a ${threshold}; si no, Econòmic.`,
+    calculation: "Càlcul",
+    formula: (average, size, price) => `${average} x ${size} = ${price}`,
+    targetSize: "Mida objectiu",
+    estimatedPrice: "Preu estimat",
+    modelNote:
+      "Això és un model perquè produeix una predicció, però no és aprenentatge automàtic: no s'entrena ni s'optimitza res.",
+    actionEyebrow: "Model d'un pas",
+    engineeringHint:
+      "Crea una característica nova dividint el preu de cada habitatge conegut per la seva mida.",
+    extrapolateHint:
+      "Ara calcula la mitjana de la característica €/m² i multiplica-la per la mida de l'habitatge objectiu.",
+    featureEngineering: "Enginyeria de característiques",
+    extrapolate: "Extrapola preu",
+    clear: "Esborra estimació"
+  },
   controls: {
     reset: "Reinicia l'arbre",
     language: "Idioma",

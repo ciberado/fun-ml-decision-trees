@@ -38,6 +38,7 @@ class DatasetTable extends HTMLElement {
 
     const { dataset, selectedRow, ui } = this._state;
     const messages = getMessages(ui.locale);
+    const showPricePerM2 = ui.showPricePerM2 ?? true;
 
     this.innerHTML = `
       <section class="subpanel">
@@ -80,7 +81,7 @@ class DatasetTable extends HTMLElement {
                       <td>${translateClassLabel(row.label, ui.locale)}</td>
                       <td>${messages.common.sizeValue(row.size)}</td>
                       <td>${row.neighborhood}</td>
-                      <td>${formatPricePerM2(row, ui.locale)}</td>
+                      <td>${showPricePerM2 ? formatPricePerM2(row, ui.locale) : messages.common.unknown}</td>
                     </tr>
                   `;
                 })

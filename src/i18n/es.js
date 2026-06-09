@@ -29,6 +29,40 @@ export const es = {
     qrButtonLabel: "Abrir código QR",
     qrDialogLabel: "Modal del código QR"
   },
+  averageLesson: {
+    eyebrow: "Lección 1",
+    title: "Adivina con una media",
+    copy:
+      "Empieza con el modelo más simple posible: calcula la media de los precios conocidos por m², extrapola el precio de la vivienda objetivo y aplica la frontera Económico/Premium.",
+    summaryLabel: "Resumen del modelo de precio medio",
+    target: "Objetivo",
+    knownRows: (count) => `${count} filas conocidas`,
+    notCalculated: "Sin estimación todavía",
+    featureMissing: "Característica sin crear",
+    featureReady: "Característica €/m² lista",
+    averagePricePerM2: "Media €/m²",
+    verdict: "Veredicto",
+    resultTitle: "Resultado",
+    placeholderTitle: "Esperando estimación",
+    placeholderCopy: "Usa la acción de extrapolar para calcular una estimación de precio para la vivienda objetivo.",
+    featurePlaceholderCopy: "Empieza creando una característica €/m² a partir del precio y el tamaño de cada vivienda conocida.",
+    predictedAs: (rowId, label) => `Fila ${rowId}: ${label}`,
+    thresholdRule: (threshold) => `Premium si la estimación está por encima de ${threshold}; si no, Económico.`,
+    calculation: "Cálculo",
+    formula: (average, size, price) => `${average} x ${size} = ${price}`,
+    targetSize: "Tamaño objetivo",
+    estimatedPrice: "Precio estimado",
+    modelNote:
+      "Esto es un modelo porque produce una predicción, pero no es aprendizaje automático: no se entrena ni se optimiza nada.",
+    actionEyebrow: "Modelo de un paso",
+    engineeringHint:
+      "Crea una característica nueva dividiendo el precio de cada vivienda conocida por su tamaño.",
+    extrapolateHint:
+      "Ahora calcula la media de la característica €/m² y multiplícala por el tamaño de la vivienda objetivo.",
+    featureEngineering: "Ingeniería de características",
+    extrapolate: "Extrapolar precio",
+    clear: "Borrar estimación"
+  },
   controls: {
     reset: "Reiniciar árbol",
     language: "Idioma",

@@ -29,6 +29,40 @@ export const en = {
     qrButtonLabel: "Open QR code",
     qrDialogLabel: "QR code modal"
   },
+  averageLesson: {
+    eyebrow: "Lesson 1",
+    title: "Guess with one average",
+    copy:
+      "Start with the simplest possible model: average the known prices per m², extrapolate the target apartment price, then apply the Budget/Premium boundary.",
+    summaryLabel: "Average price model summary",
+    target: "Target",
+    knownRows: (count) => `${count} known rows`,
+    notCalculated: "No estimate yet",
+    featureMissing: "Feature not engineered",
+    featureReady: "€/m² feature ready",
+    averagePricePerM2: "Average €/m²",
+    verdict: "Verdict",
+    resultTitle: "Result",
+    placeholderTitle: "Awaiting estimate",
+    placeholderCopy: "Use the extrapolate action to calculate a price estimate for the target apartment.",
+    featurePlaceholderCopy: "Start by engineering a €/m² feature from each known apartment's price and size.",
+    predictedAs: (rowId, label) => `Row ${rowId}: ${label}`,
+    thresholdRule: (threshold) => `Premium if the estimate is above ${threshold}; otherwise Budget.`,
+    calculation: "Calculation",
+    formula: (average, size, price) => `${average} x ${size} = ${price}`,
+    targetSize: "Target size",
+    estimatedPrice: "Estimated price",
+    modelNote:
+      "This is a model because it makes a prediction, but it is not machine learning: nothing is trained or optimized.",
+    actionEyebrow: "One-step model",
+    engineeringHint:
+      "Create a new feature by dividing each known apartment price by its size.",
+    extrapolateHint:
+      "Now average the engineered €/m² feature and multiply it by the target apartment size.",
+    featureEngineering: "Feature engineering",
+    extrapolate: "Extrapolate price",
+    clear: "Clear estimate"
+  },
   controls: {
     reset: "Reset Tree",
     language: "Language",

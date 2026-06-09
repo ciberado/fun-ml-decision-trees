@@ -1,5 +1,6 @@
 export const MAX_TREE_DEPTH = 4;
 export const POSITIVE_CLASS = "Premium";
+export const PRICE_CLASS_THRESHOLD = 250;
 export const GLOBAL_FALLBACK_REASON = {
   EMPTY: "empty",
   TIE: "tie",
