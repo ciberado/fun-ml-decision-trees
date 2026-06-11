@@ -439,14 +439,6 @@ class TrainedTreeLesson extends HTMLElement {
             >
               ${messages.trainedLesson.nextStep}
             </button>
-            <button
-              type="button"
-              class="action-button"
-              data-action="show-final"
-              ${this.visibleStepCount >= this.result.trainingSteps.length || this.isPlayingTraining ? "disabled" : ""}
-            >
-              ${messages.trainedLesson.showFinal}
-            </button>
             ${
               this.isPlayingTraining
                 ? `
