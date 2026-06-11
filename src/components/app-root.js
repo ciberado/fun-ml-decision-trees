@@ -12,13 +12,10 @@ import {
 import { getMessages } from "../i18n/index.js";
 import "./control-bar.js";
 import "./dataset-table.js";
+import "./hero-qr.js";
 import "./tree-editor.js";
 
-const QR_CODE_URL =
-  "https://quickchart.io/qr?text=https%3A%2F%2Fciberado.github.io%2Ffun-ml-decision-trees%2F&size=400";
-
 const EVENT_NAMES = [
-  "locale-change",
   "row-select",
   "reset-tree",
   "preview-condition",
@@ -33,10 +30,8 @@ class AppRoot extends HTMLElement {
     super();
     this.state = createInitialState();
     this.notice = "";
-    this.isQrModalOpen = false;
     this.handleEvent = this.handleEvent.bind(this);
-    this.handleClick = this.handleClick.bind(this);
-    this.handleKeydown = this.handleKeydown.bind(this);
+    this.handleLocaleChange = this.handleLocaleChange.bind(this);
   }
 
   connectedCallback() {
@@ -44,8 +39,7 @@ class AppRoot extends HTMLElement {
       this.addEventListener(eventName, this.handleEvent);
     }
 
-    this.addEventListener("click", this.handleClick);
-    window.addEventListener("keydown", this.handleKeydown);
+    window.addEventListener("app-locale-change", this.handleLocaleChange);
     this.render();
   }
 
@@ -54,8 +48,7 @@ class AppRoot extends HTMLElement {
       this.removeEventListener(eventName, this.handleEvent);
     }
 
-    this.removeEventListener("click", this.handleClick);
-    window.removeEventListener("keydown", this.handleKeydown);
+    window.removeEventListener("app-locale-change", this.handleLocaleChange);
   }
 
   updateControlBar(state) {
@@ -66,37 +59,15 @@ class AppRoot extends HTMLElement {
     }
   }
 
-  handleClick(event) {
-    const qrToggle = event.target.closest("[data-qr-toggle]");
-    const qrClose = event.target.closest("[data-qr-close]");
-
-    if (qrToggle) {
-      this.isQrModalOpen = true;
-      this.render();
-      return;
-    }
-
-    if (this.isQrModalOpen && qrClose) {
-      this.isQrModalOpen = false;
-      this.render();
-    }
-  }
-
-  handleKeydown() {
-    if (!this.isQrModalOpen) {
-      return;
-    }
-
-    this.isQrModalOpen = false;
+  handleLocaleChange(event) {
+    this.state = setLocale(this.state, event.detail?.locale);
+    this.notice = "";
     this.render();
   }
 
   handleEvent(event) {
     try {
       switch (event.type) {
-        case "locale-change":
-          this.state = setLocale(this.state, event.detail.locale);
-          break;
         case "row-select":
           this.state = selectRow(this.state, event.detail.rowId);
           break;
@@ -141,6 +112,8 @@ class AppRoot extends HTMLElement {
     const targetRowId = this.state.prediction.targetRowId;
     const messages = getMessages(this.state.ui.locale);
 
+    document.documentElement.lang = this.state.ui.locale;
+
     this.innerHTML = `
       <div class="page-shell">
         <header class="hero">
@@ -149,15 +122,7 @@ class AppRoot extends HTMLElement {
               <p class="eyebrow">${messages.hero.eyebrow}</p>
               <h1>${messages.hero.title(targetRowId)}</h1>
             </div>
-            <button
-              type="button"
-              class="hero-qr-button"
-              data-qr-toggle
-              aria-label="${messages.hero.qrButtonLabel}"
-              title="${messages.hero.qrButtonLabel}"
-            >
-              <img class="hero-qr-image" src="${QR_CODE_URL}" alt="${messages.hero.qrAlt}">
-            </button>
+            <hero-qr locale="${this.state.ui.locale}"></hero-qr>
           </div>
           <p class="hero-copy">${messages.hero.copy}</p>
         </header>
@@ -176,23 +141,6 @@ class AppRoot extends HTMLElement {
           </section>
         </main>
 
-        ${
-          this.isQrModalOpen
-            ? `
-              <div class="modal-overlay" data-qr-close role="presentation">
-                <div
-                  class="modal-card modal-card-image"
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label="${messages.hero.qrDialogLabel}"
-                  data-qr-close
-                >
-                  <img class="modal-qr-image" src="${QR_CODE_URL}" alt="${messages.hero.qrAlt}" data-qr-close>
-                </div>
-              </div>
-            `
-            : ""
-        }
       </div>
     `;
 

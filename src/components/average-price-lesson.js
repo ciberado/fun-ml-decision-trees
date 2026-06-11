@@ -3,12 +3,12 @@ import { buildAveragePriceModel } from "../domain/average-price-model.js";
 import {
   detectInitialLocale,
   getMessages,
-  LOCALE_OPTIONS,
   resolveLocale,
   translateClassLabel
 } from "../i18n/index.js";
 import { formatPrice, formatPricePerM2Value } from "../utils/formatters.js";
 import "./dataset-table.js";
+import "./hero-qr.js";
 
 class AveragePriceLesson extends HTMLElement {
   constructor() {
@@ -20,21 +20,21 @@ class AveragePriceLesson extends HTMLElement {
     this.result = null;
     this.notice = "";
     this.handleClick = this.handleClick.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleLocaleChange = this.handleLocaleChange.bind(this);
     this.handleRowSelect = this.handleRowSelect.bind(this);
   }
 
   connectedCallback() {
     this.addEventListener("click", this.handleClick);
-    this.addEventListener("change", this.handleChange);
     this.addEventListener("row-select", this.handleRowSelect);
+    window.addEventListener("app-locale-change", this.handleLocaleChange);
     this.render();
   }
 
   disconnectedCallback() {
     this.removeEventListener("click", this.handleClick);
-    this.removeEventListener("change", this.handleChange);
     this.removeEventListener("row-select", this.handleRowSelect);
+    window.removeEventListener("app-locale-change", this.handleLocaleChange);
   }
 
   getTableState() {
@@ -84,14 +84,8 @@ class AveragePriceLesson extends HTMLElement {
     }
   }
 
-  handleChange(event) {
-    const localeSelect = event.target.closest("[data-locale-select]");
-
-    if (!localeSelect) {
-      return;
-    }
-
-    this.locale = resolveLocale(localeSelect.value);
+  handleLocaleChange(event) {
+    this.locale = resolveLocale(event.detail?.locale);
     this.render();
   }
 
@@ -196,6 +190,8 @@ class AveragePriceLesson extends HTMLElement {
   render() {
     const messages = getMessages(this.locale);
 
+    document.documentElement.lang = this.locale;
+
     this.innerHTML = `
       <div class="page-shell">
         <header class="hero">
@@ -204,21 +200,13 @@ class AveragePriceLesson extends HTMLElement {
               <p class="eyebrow">${messages.averageLesson.eyebrow}</p>
               <h1>${messages.averageLesson.title}</h1>
             </div>
+            <hero-qr locale="${this.locale}"></hero-qr>
           </div>
           <p class="hero-copy">${messages.averageLesson.copy}</p>
         </header>
 
         <section class="control-strip">
           <div class="control-actions">
-            <label class="locale-picker">
-              <span class="locale-picker-label">${messages.controls.language}</span>
-              <select class="locale-select" data-locale-select aria-label="${messages.controls.language}">
-                ${LOCALE_OPTIONS.map(
-                  (option) =>
-                    `<option value="${option.value}" ${option.value === this.locale ? "selected" : ""}>${option.label}</option>`
-                ).join("")}
-              </select>
-            </label>
           </div>
           ${this.renderSummaryPills(messages)}
         </section>

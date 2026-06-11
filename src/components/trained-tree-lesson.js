@@ -6,11 +6,11 @@ import { trainDecisionTree } from "../domain/train-decision-tree.js";
 import {
   detectInitialLocale,
   getMessages,
-  LOCALE_OPTIONS,
   resolveLocale,
   translateClassLabel
 } from "../i18n/index.js";
 import { formatCondition, formatPercent } from "../utils/formatters.js";
+import "./hero-qr.js";
 import "./row-ball-layer.js";
 
 const TRAINING_PREVIEW_DELAY = 1000;
@@ -113,21 +113,21 @@ class TrainedTreeLesson extends HTMLElement {
     this.playbackToken = 0;
     this.notice = "";
     this.handleClick = this.handleClick.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleLocaleChange = this.handleLocaleChange.bind(this);
     this.handleRowSelect = this.handleRowSelect.bind(this);
   }
 
   connectedCallback() {
     this.addEventListener("click", this.handleClick);
-    this.addEventListener("change", this.handleChange);
     this.addEventListener("row-select", this.handleRowSelect);
+    window.addEventListener("app-locale-change", this.handleLocaleChange);
     this.render();
   }
 
   disconnectedCallback() {
     this.removeEventListener("click", this.handleClick);
-    this.removeEventListener("change", this.handleChange);
     this.removeEventListener("row-select", this.handleRowSelect);
+    window.removeEventListener("app-locale-change", this.handleLocaleChange);
     this.cancelTrainingPlayback();
   }
 
@@ -195,14 +195,8 @@ class TrainedTreeLesson extends HTMLElement {
     }
   }
 
-  handleChange(event) {
-    const localeSelect = event.target.closest("[data-locale-select]");
-
-    if (!localeSelect) {
-      return;
-    }
-
-    this.locale = resolveLocale(localeSelect.value);
+  handleLocaleChange(event) {
+    this.locale = resolveLocale(event.detail?.locale);
     this.render();
   }
 
@@ -714,6 +708,8 @@ class TrainedTreeLesson extends HTMLElement {
   render() {
     const messages = getMessages(this.locale);
 
+    document.documentElement.lang = this.locale;
+
     this.innerHTML = `
       <div class="page-shell trained-page-shell">
         <header class="hero">
@@ -722,21 +718,13 @@ class TrainedTreeLesson extends HTMLElement {
               <p class="eyebrow">${messages.trainedLesson.eyebrow}</p>
               <h1>${messages.trainedLesson.title}</h1>
             </div>
+            <hero-qr locale="${this.locale}"></hero-qr>
           </div>
           <p class="hero-copy">${messages.trainedLesson.copy}</p>
         </header>
 
         <section class="control-strip">
           <div class="control-actions">
-            <label class="locale-picker">
-              <span class="locale-picker-label">${messages.controls.language}</span>
-              <select class="locale-select" data-locale-select aria-label="${messages.controls.language}">
-                ${LOCALE_OPTIONS.map(
-                  (option) =>
-                    `<option value="${option.value}" ${option.value === this.locale ? "selected" : ""}>${option.label}</option>`
-                ).join("")}
-              </select>
-            </label>
             <button type="button" class="action-button primary" data-action="generate-model">
               ${messages.trainedLesson.generateModel}
             </button>
