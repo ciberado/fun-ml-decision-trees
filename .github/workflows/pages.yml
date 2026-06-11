@@ -31,7 +31,7 @@ jobs:
       - name: Prepare static site
         run: |
           mkdir -p dist
-          cp index.html styles.css dist/
+          cp index.html lesson-*.html styles.css dist/
           cp -R src dist/src
           touch dist/.nojekyll
 
