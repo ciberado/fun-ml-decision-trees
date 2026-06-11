@@ -35,7 +35,9 @@ No build pipeline is checked in. Keep the app runnable as static files.
 - `git status --short`
   Review local changes before committing.
 
-If port `8080` is already running and you need an isolated QA server, use a different port and stop it before finishing.
+If port `8080` is already running, it means there is already a server with the appliction behind it. Just use it.
+
+You are running in a tmux session. Feel free to make use of it if needed to spawn new processes, check their outputs, etc.
 
 ## Coding Style & Naming Conventions
 Use vanilla JavaScript and Web Components only. Prefer:
