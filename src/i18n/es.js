@@ -20,6 +20,65 @@ export const es = {
     selectRow: (rowId) => `Seleccionar fila ${rowId}`,
     sizeValue: (size) => `${size} m²`
   },
+  navigation: {
+    label: "Navegación principal",
+    brand: "Lecciones de decisión",
+    links: {
+      home: "Inicio",
+      average: "Lección 1",
+      decisionTree: "Lección 2",
+      trainedTree: "Lección 3"
+    }
+  },
+  home: {
+    eyebrow: "Tres lecciones pequeñas",
+    title: "Aprende cómo los modelos simples toman decisiones",
+    copy:
+      "Un conjunto de datos de viviendas se convierte en un patio de juego para predicciones, reglas manuales y un árbol entrenado automáticamente.",
+    valueTitle: "Para qué sirve",
+    valueCopy:
+      "Las lecciones conectan ideas de modelos con acciones visibles: crear una característica, hacer una predicción, dividir filas en grupos y comparar el resultado con lo que dicen los datos.",
+    conceptsTitle: "Conceptos principales",
+    concepts: [
+      {
+        kicker: "Características",
+        title: "Convierte datos en señales útiles",
+        copy: "El precio por m² muestra cómo una columna nueva puede hacer posible una predicción simple."
+      },
+      {
+        kicker: "Reglas",
+        title: "Envía ejemplos por un árbol",
+        copy: "Las preguntas binarias separan filas en hojas, donde la mayoría local se convierte en la predicción."
+      },
+      {
+        kicker: "Entrenamiento",
+        title: "Elige divisiones puntuándolas",
+        copy: "El árbol generado compara candidatas, conserva la división más fuerte y repite con un límite de profundidad."
+      }
+    ],
+    lessonsEyebrow: "Empieza donde quieras",
+    lessonsTitle: "Lecciones",
+    lessons: [
+      {
+        href: "./lesson-average-price.html",
+        label: "Lección 1",
+        title: "Adivina con una media",
+        copy: "Ingeniería de características y una predicción de referencia."
+      },
+      {
+        href: "./lesson-decision-tree.html",
+        label: "Lección 2",
+        title: "Construye un árbol de decisión pequeño",
+        copy: "Divisiones manuales, hojas, rutas y evaluación."
+      },
+      {
+        href: "./lesson-trained-tree.html",
+        label: "Lección 3",
+        title: "Deja que el ordenador construya el árbol",
+        copy: "Divisiones candidatas, ganancia y un modelo entrenado."
+      }
+    ]
+  },
   hero: {
     eyebrow: "Lección interactiva",
     title: (rowId) => `Construye un árbol de decisión pequeño`,

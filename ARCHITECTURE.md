@@ -3,7 +3,7 @@
 ## Overview
 This application is a client-side educational web app. It should run entirely in the browser, use no frontend framework, and keep the logic simple enough to inspect and maintain.
 
-The app can contain multiple static lesson pages that share the same dataset, styles, localization catalog, and pure domain helpers. Navigation between lessons can be added later without changing the individual lesson entry points.
+The app contains a static home page plus multiple static lesson pages that share the same dataset, styles, localization catalog, navigation, and pure domain helpers.
 
 The architecture should separate:
 
@@ -99,6 +99,8 @@ Its generated model is derived by training on known rows only, routing the full 
 Web Components render the current state into:
 
 - average-price lesson
+- home page
+- site navigation
 - dataset table
 - row balls
 - tree editor
@@ -119,10 +121,14 @@ UI events mutate source state only. After any valid mutation:
 /
   index.html
   lesson-average-price.html
+  lesson-decision-tree.html
+  lesson-trained-tree.html
   styles.css
   src/
+    home-main.js
     main.js
     average-price-main.js
+    trained-tree-main.js
     state/
       app-state.js
       recompute.js
@@ -146,6 +152,9 @@ UI events mutate source state only. After any valid mutation:
     components/
       app-root.js
       average-price-lesson.js
+      home-page.js
+      site-nav.js
+      trained-tree-lesson.js
       control-bar.js
       dataset-table.js
       row-ball-layer.js

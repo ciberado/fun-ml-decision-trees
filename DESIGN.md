@@ -395,11 +395,16 @@ For future responsive adaptation, sections should stack in this order:
 
 ### Suggested Stack
 - `index.html`
+- lesson entry HTML files
 - `styles.css`
 - ES modules
 - Web Components
 
 ### Suggested Components
+- `home-page`
+  - presents the lesson sequence and core concepts
+- `site-nav`
+  - links the home page and lesson entry points
 - `app-root`
   - owns shared state and orchestration
 - `dataset-table`

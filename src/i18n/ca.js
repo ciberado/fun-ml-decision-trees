@@ -20,6 +20,65 @@ export const ca = {
     selectRow: (rowId) => `Selecciona la fila ${rowId}`,
     sizeValue: (size) => `${size} m²`
   },
+  navigation: {
+    label: "Navegació principal",
+    brand: "Lliçons de decisió",
+    links: {
+      home: "Inici",
+      average: "Lliçó 1",
+      decisionTree: "Lliçó 2",
+      trainedTree: "Lliçó 3"
+    }
+  },
+  home: {
+    eyebrow: "Tres lliçons petites",
+    title: "Aprèn com els models simples prenen decisions",
+    copy:
+      "Un conjunt de dades d'habitatges es converteix en un espai de joc per a prediccions, regles manuals i un arbre entrenat automàticament.",
+    valueTitle: "Per a què serveix",
+    valueCopy:
+      "Les lliçons connecten idees de models amb accions visibles: crear una característica, fer una predicció, dividir files en grups i comparar el resultat amb el que diuen les dades.",
+    conceptsTitle: "Conceptes principals",
+    concepts: [
+      {
+        kicker: "Característiques",
+        title: "Converteix dades en senyals útils",
+        copy: "El preu per m² mostra com una columna nova pot fer possible una predicció simple."
+      },
+      {
+        kicker: "Regles",
+        title: "Envia exemples per un arbre",
+        copy: "Les preguntes binàries separen files en fulles, on la majoria local es converteix en la predicció."
+      },
+      {
+        kicker: "Entrenament",
+        title: "Tria divisions puntuant-les",
+        copy: "L'arbre generat compara candidates, conserva la divisió més forta i repeteix amb un límit de profunditat."
+      }
+    ],
+    lessonsEyebrow: "Comença on vulguis",
+    lessonsTitle: "Lliçons",
+    lessons: [
+      {
+        href: "./lesson-average-price.html",
+        label: "Lliçó 1",
+        title: "Endevina amb una mitjana",
+        copy: "Enginyeria de característiques i una predicció de referència."
+      },
+      {
+        href: "./lesson-decision-tree.html",
+        label: "Lliçó 2",
+        title: "Construeix un arbre de decisió petit",
+        copy: "Divisions manuals, fulles, rutes i avaluació."
+      },
+      {
+        href: "./lesson-trained-tree.html",
+        label: "Lliçó 3",
+        title: "Deixa que l'ordinador construeixi l'arbre",
+        copy: "Divisions candidates, guany i un model entrenat."
+      }
+    ]
+  },
   hero: {
     eyebrow: "Lliçó interactiva",
     title: (rowId) => `Construeix un arbre de decisió petit`,

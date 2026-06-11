@@ -5,7 +5,7 @@ This project should be delivered in small phases. Each phase should leave the ap
 
 The plan below assumes the current `DESIGN.md` is the source of truth.
 
-The scope has expanded from one decision-tree lesson to a sequence of lessons. The first added lesson introduces a deliberately crude average-price model before learners move to the decision-tree editor. Navigation between lessons remains a later integration step.
+The scope has expanded from one decision-tree lesson to a sequence of lessons. The first added lesson introduces a deliberately crude average-price model before learners move to the decision-tree editor. A small shared navigation bar links the home page and every lesson.
 
 The sequence now also includes a generated decision-tree lesson after the manual tree editor. It introduces a small training algorithm without changing the static, framework-free runtime model.
 
@@ -36,6 +36,7 @@ Set up the project structure and the static application shell.
 
 ### Deliverables
 - `index.html`
+- `lesson-decision-tree.html`
 - `styles.css`
 - JavaScript module entry point
 - initial Web Component registration

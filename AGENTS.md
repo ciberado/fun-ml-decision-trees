@@ -9,8 +9,10 @@ This repository is a static, framework-free teaching app with documentation kept
 
 The app now contains multiple lesson entry points:
 
+- `index.html`: home page
 - `lesson-average-price.html`: first lesson, a feature-engineering and average-price model
-- `index.html`: decision-tree lesson
+- `lesson-decision-tree.html`: decision-tree lesson
+- `lesson-trained-tree.html`: generated decision-tree lesson
 
 Follow the structure defined in `ARCHITECTURE.md`:
 

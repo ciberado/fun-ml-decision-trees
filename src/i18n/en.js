@@ -20,6 +20,65 @@ export const en = {
     selectRow: (rowId) => `Select row ${rowId}`,
     sizeValue: (size) => `${size} m²`
   },
+  navigation: {
+    label: "Main navigation",
+    brand: "Decision lessons",
+    links: {
+      home: "Home",
+      average: "Lesson 1",
+      decisionTree: "Lesson 2",
+      trainedTree: "Lesson 3"
+    }
+  },
+  home: {
+    eyebrow: "Three tiny lessons",
+    title: "Learn how simple models make decisions",
+    copy:
+      "A small housing dataset becomes a playground for predictions, hand-built rules, and an automatically trained tree.",
+    valueTitle: "What this helps with",
+    valueCopy:
+      "The lessons connect model ideas to visible actions: create a feature, make a prediction, split rows into groups, and compare the result with what the data says.",
+    conceptsTitle: "Main concepts",
+    concepts: [
+      {
+        kicker: "Features",
+        title: "Turn raw data into useful signals",
+        copy: "Price per m² shows how a new column can make a simple prediction possible."
+      },
+      {
+        kicker: "Rules",
+        title: "Route examples through a tree",
+        copy: "Binary questions split rows into leaves, where the local majority becomes the prediction."
+      },
+      {
+        kicker: "Training",
+        title: "Choose splits by scoring them",
+        copy: "The generated tree compares candidates, keeps the strongest split, and repeats with a depth limit."
+      }
+    ],
+    lessonsEyebrow: "Start anywhere",
+    lessonsTitle: "Lessons",
+    lessons: [
+      {
+        href: "./lesson-average-price.html",
+        label: "Lesson 1",
+        title: "Guess with one average",
+        copy: "Feature engineering and a baseline prediction."
+      },
+      {
+        href: "./lesson-decision-tree.html",
+        label: "Lesson 2",
+        title: "Build a tiny decision tree",
+        copy: "Manual splits, leaves, routing, and evaluation."
+      },
+      {
+        href: "./lesson-trained-tree.html",
+        label: "Lesson 3",
+        title: "Let the computer build the tree",
+        copy: "Candidate splits, gain, and a trained model."
+      }
+    ]
+  },
   hero: {
     eyebrow: "Interactive Lesson",
     title: (rowId) => `Build a tiny decision tree`,
