@@ -127,11 +127,13 @@ The app should feel like an interactive lesson and a constrained tree editor at 
 4. The app scores binary candidate splits with Gini impurity reduction.
 5. The first generated-model state shows all row balls together before any split is applied.
 6. The app reveals the generated tree step by step, one chosen split at a time.
-7. Unrevealed child groups remain visible as pending row buckets until their split is shown.
-8. The target row waits outside the partial tree and only routes into a leaf once the generated model is complete.
-9. The app shows the chosen split for the current training step and a compact candidate-score comparison.
-10. The generated tree routes the target row and known rows into leaf buckets.
-11. The app shows the target prediction and evaluation metrics for the generated model.
+7. The user can play training to preview candidate rules one by one before the best split is committed.
+8. During playback, each candidate rule temporarily splits the current row group so learners can see its effect.
+9. Unrevealed child groups remain visible as pending row buckets until their split is shown.
+10. The target row waits outside the partial tree and only routes into a leaf once the generated model is complete.
+11. The app shows the chosen split for the current training step and a compact candidate-score comparison.
+12. The generated tree routes the target row and known rows into leaf buckets.
+13. The app shows the target prediction and evaluation metrics for the generated model.
 
 ### Interaction Principles
 - Every edit must produce immediate visible feedback.

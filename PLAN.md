@@ -191,6 +191,7 @@ Show that the split configuration used by a decision tree can be found automatic
 - fixed max depth of `2` for the lesson
 - read-only generated tree revealed one split at a time
 - first generated state with all rows together before the root split
+- training playback that previews candidate split rules before committing the best split
 - target row held outside the partial tree until the final generated model is complete
 - pending row groups for unrevealed splits
 - current-step candidate split score visualization

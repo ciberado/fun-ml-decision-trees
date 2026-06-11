@@ -13,16 +13,8 @@ import {
 import { formatCondition, formatPercent } from "../utils/formatters.js";
 import "./row-ball-layer.js";
 
-function collectLeaves(node, leaves = []) {
-  if (node.type === "leaf") {
-    leaves.push(node);
-    return leaves;
-  }
-
-  collectLeaves(node.trueBranch, leaves);
-  collectLeaves(node.falseBranch, leaves);
-  return leaves;
-}
+const TRAINING_PREVIEW_DELAY = 1000;
+const BEST_SELECTION_DELAY = 1500;
 
 function buildLeafDetails(dataset, routing, globalMajorityLabel) {
   const rowsById = Object.fromEntries(dataset.map((row) => [row.id, row]));
@@ -100,6 +92,12 @@ function getTargetRows(rows) {
   return rows.filter((row) => row.isTarget);
 }
 
+function wait(milliseconds) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
+
 class TrainedTreeLesson extends HTMLElement {
   constructor() {
     super();
@@ -108,6 +106,11 @@ class TrainedTreeLesson extends HTMLElement {
     this.selectedRowId = getTargetRowId(this.rows);
     this.result = null;
     this.visibleStepCount = 0;
+    this.previewStepIndex = null;
+    this.previewCandidateIndex = null;
+    this.previewIsBestSelection = false;
+    this.isPlayingTraining = false;
+    this.playbackToken = 0;
     this.notice = "";
     this.handleClick = this.handleClick.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -125,15 +128,18 @@ class TrainedTreeLesson extends HTMLElement {
     this.removeEventListener("click", this.handleClick);
     this.removeEventListener("change", this.handleChange);
     this.removeEventListener("row-select", this.handleRowSelect);
+    this.cancelTrainingPlayback();
   }
 
-  handleClick(event) {
+  async handleClick(event) {
     const action = event.target.closest("[data-action]")?.dataset.action;
 
     if (action === "generate-model") {
+      this.cancelTrainingPlayback();
       try {
         this.result = this.buildResult();
         this.visibleStepCount = 0;
+        this.clearPreview();
         this.notice = "";
       } catch (error) {
         this.notice = error instanceof Error ? error.message : getMessages(this.locale).status.unknownError;
@@ -144,26 +150,46 @@ class TrainedTreeLesson extends HTMLElement {
     }
 
     if (action === "previous-step" && this.result) {
+      this.cancelTrainingPlayback();
+      this.clearPreview();
       this.visibleStepCount = Math.max(0, this.visibleStepCount - 1);
       this.render();
       return;
     }
 
     if (action === "next-step" && this.result) {
+      this.cancelTrainingPlayback();
+      this.clearPreview();
       this.visibleStepCount = Math.min(this.result.trainingSteps.length, this.visibleStepCount + 1);
       this.render();
       return;
     }
 
     if (action === "show-final" && this.result) {
+      this.cancelTrainingPlayback();
+      this.clearPreview();
       this.visibleStepCount = this.result.trainingSteps.length;
       this.render();
       return;
     }
 
+    if (action === "play-training") {
+      await this.playTraining();
+      return;
+    }
+
+    if (action === "stop-training") {
+      this.cancelTrainingPlayback();
+      this.clearPreview();
+      this.render();
+      return;
+    }
+
     if (action === "clear-model") {
+      this.cancelTrainingPlayback();
       this.result = null;
       this.visibleStepCount = 0;
+      this.clearPreview();
       this.notice = "";
       this.render();
     }
@@ -183,6 +209,127 @@ class TrainedTreeLesson extends HTMLElement {
   handleRowSelect(event) {
     this.selectedRowId = Number(event.detail.rowId);
     this.render();
+  }
+
+  clearPreview() {
+    this.previewStepIndex = null;
+    this.previewCandidateIndex = null;
+    this.previewIsBestSelection = false;
+  }
+
+  cancelTrainingPlayback() {
+    this.playbackToken += 1;
+    this.isPlayingTraining = false;
+  }
+
+  getPreviewCandidates(step) {
+    return [...step.candidates].sort((left, right) => left.gain - right.gain);
+  }
+
+  getDisplayCandidates(step, preview) {
+    if (preview) {
+      return this.getPreviewCandidates(step);
+    }
+
+    return [...step.candidates].sort((left, right) => right.gain - left.gain);
+  }
+
+  getActivePreview() {
+    if (
+      this.previewStepIndex == null ||
+      this.previewCandidateIndex == null ||
+      !this.result
+    ) {
+      return null;
+    }
+
+    const step = this.result.trainingSteps[this.previewStepIndex];
+
+    if (!step) {
+      return null;
+    }
+
+    const candidate = this.getPreviewCandidates(step)[this.previewCandidateIndex];
+
+    if (!candidate) {
+      return null;
+    }
+
+    return {
+      stepIndex: this.previewStepIndex,
+      candidateIndex: this.previewCandidateIndex,
+      isBestSelection: this.previewIsBestSelection,
+      step,
+      candidate
+    };
+  }
+
+  async playTraining() {
+    if (this.isPlayingTraining) {
+      return;
+    }
+
+    if (!this.result) {
+      try {
+        this.result = this.buildResult();
+        this.visibleStepCount = 0;
+      } catch (error) {
+        this.notice = error instanceof Error ? error.message : getMessages(this.locale).status.unknownError;
+        this.render();
+        return;
+      }
+    }
+
+    const token = this.playbackToken + 1;
+    this.playbackToken = token;
+    this.isPlayingTraining = true;
+    this.clearPreview();
+    this.render();
+
+    for (let stepIndex = this.visibleStepCount; stepIndex < this.result.trainingSteps.length; stepIndex += 1) {
+      const step = this.result.trainingSteps[stepIndex];
+      const candidates = this.getPreviewCandidates(step);
+
+      for (let candidateIndex = 0; candidateIndex < candidates.length; candidateIndex += 1) {
+        if (this.playbackToken !== token) {
+          return;
+        }
+
+        this.previewStepIndex = stepIndex;
+        this.previewCandidateIndex = candidateIndex;
+        this.previewIsBestSelection = false;
+        this.render();
+        await wait(TRAINING_PREVIEW_DELAY);
+      }
+
+      if (this.playbackToken !== token) {
+        return;
+      }
+
+      const bestCandidateIndex = candidates.findIndex((candidate) =>
+        sameCondition(candidate.condition, step.bestCondition)
+      );
+      this.previewStepIndex = stepIndex;
+      this.previewCandidateIndex = Math.max(0, bestCandidateIndex);
+      this.previewIsBestSelection = true;
+      this.render();
+      await wait(BEST_SELECTION_DELAY);
+
+      if (this.playbackToken !== token) {
+        return;
+      }
+
+      this.clearPreview();
+      this.visibleStepCount = stepIndex + 1;
+      this.render();
+      await wait(TRAINING_PREVIEW_DELAY);
+    }
+
+    if (this.playbackToken === token) {
+      this.clearPreview();
+      this.isPlayingTraining = false;
+      this.render();
+    }
   }
 
   buildResult() {
@@ -227,15 +374,21 @@ class TrainedTreeLesson extends HTMLElement {
     `;
   }
 
-  renderCandidate(candidate, bestCondition, maxGain) {
+  renderCandidate(candidate, bestCondition, maxGain, activeCondition = null, isBestSelection = false) {
     const messages = getMessages(this.locale);
     const isBest = sameCondition(candidate.condition, bestCondition);
+    const isActive = activeCondition && sameCondition(candidate.condition, activeCondition);
     const width = maxGain > 0 ? Math.max(4, (candidate.gain / maxGain) * 100) : 4;
 
     return `
-      <li class="candidate-row ${isBest ? "is-best" : ""}">
+      <li class="candidate-row ${isBest ? "is-best" : ""} ${isActive ? "is-active" : ""} ${isActive && isBestSelection ? "is-selected-best" : ""}">
         <div class="candidate-main">
           <span class="candidate-condition">${formatCondition(candidate.condition, this.locale)}</span>
+          ${
+            isActive
+              ? `<span class="tiny-pill">${isBestSelection ? messages.trainedLesson.selectedBest : messages.trainedLesson.previewing}</span>`
+              : ""
+          }
           ${isBest ? `<span class="tiny-pill">${messages.trainedLesson.bestSplit}</span>` : ""}
         </div>
         <div class="candidate-meter" aria-hidden="true">
@@ -257,10 +410,13 @@ class TrainedTreeLesson extends HTMLElement {
       `;
     }
 
-    const visibleStep = this.result.trainingSteps[this.visibleStepCount - 1];
+    const preview = this.getActivePreview();
+    const visibleStep = preview?.step ?? this.result.trainingSteps[this.visibleStepCount - 1];
     const maxGain = visibleStep
       ? Math.max(...visibleStep.candidates.map((candidate) => candidate.gain))
       : 0;
+    const activeCondition = preview?.candidate.condition ?? null;
+    const isBestSelection = preview?.isBestSelection ?? false;
 
     return `
       <section class="panel trained-steps-panel">
@@ -277,7 +433,7 @@ class TrainedTreeLesson extends HTMLElement {
               type="button"
               class="action-button"
               data-action="previous-step"
-              ${this.visibleStepCount <= 0 ? "disabled" : ""}
+              ${this.visibleStepCount <= 0 || this.isPlayingTraining ? "disabled" : ""}
             >
               ${messages.trainedLesson.previousStep}
             </button>
@@ -285,7 +441,7 @@ class TrainedTreeLesson extends HTMLElement {
               type="button"
               class="action-button primary"
               data-action="next-step"
-              ${this.visibleStepCount >= this.result.trainingSteps.length ? "disabled" : ""}
+              ${this.visibleStepCount >= this.result.trainingSteps.length || this.isPlayingTraining ? "disabled" : ""}
             >
               ${messages.trainedLesson.nextStep}
             </button>
@@ -293,10 +449,28 @@ class TrainedTreeLesson extends HTMLElement {
               type="button"
               class="action-button"
               data-action="show-final"
-              ${this.visibleStepCount >= this.result.trainingSteps.length ? "disabled" : ""}
+              ${this.visibleStepCount >= this.result.trainingSteps.length || this.isPlayingTraining ? "disabled" : ""}
             >
               ${messages.trainedLesson.showFinal}
             </button>
+            ${
+              this.isPlayingTraining
+                ? `
+                  <button type="button" class="action-button" data-action="stop-training">
+                    ${messages.trainedLesson.stopTraining}
+                  </button>
+                `
+                : `
+                  <button
+                    type="button"
+                    class="action-button"
+                    data-action="play-training"
+                    ${this.visibleStepCount >= this.result.trainingSteps.length ? "disabled" : ""}
+                  >
+                    ${messages.trainedLesson.playTraining}
+                  </button>
+                `
+            }
           </div>
           <div class="training-step-list">
             ${
@@ -306,7 +480,13 @@ class TrainedTreeLesson extends HTMLElement {
                     <div class="training-step-head">
                       <div>
                         <p class="metric-label">${messages.trainedLesson.nodeRows(visibleStep.rowIds.join(", "))}</p>
-                        <h3>${messages.trainedLesson.chosenSplit(formatCondition(visibleStep.bestCondition, this.locale))}</h3>
+                        <h3>${
+                          preview
+                            ? isBestSelection
+                              ? messages.trainedLesson.selectedBestSplit(formatCondition(preview.candidate.condition, this.locale))
+                              : messages.trainedLesson.previewingSplit(formatCondition(preview.candidate.condition, this.locale))
+                            : messages.trainedLesson.chosenSplit(formatCondition(visibleStep.bestCondition, this.locale))
+                        }</h3>
                       </div>
                     </div>
                     <div class="candidate-table" role="table" aria-label="${messages.trainedLesson.trainingSubtitle}">
@@ -316,9 +496,10 @@ class TrainedTreeLesson extends HTMLElement {
                         <span role="columnheader">${messages.trainedLesson.purityValue}</span>
                       </div>
                       <ul class="candidate-list">
-                        ${[...visibleStep.candidates]
-                          .sort((left, right) => right.gain - left.gain)
-                          .map((candidate) => this.renderCandidate(candidate, visibleStep.bestCondition, maxGain))
+                        ${this.getDisplayCandidates(visibleStep, preview)
+                          .map((candidate) =>
+                            this.renderCandidate(candidate, visibleStep.bestCondition, maxGain, activeCondition, isBestSelection)
+                          )
                           .join("")}
                       </ul>
                     </div>
@@ -407,11 +588,38 @@ class TrainedTreeLesson extends HTMLElement {
       return this.renderLeaf(node, rows, branchLabel);
     }
 
+    const preview = this.getActivePreview();
     const visibleNodeIds = new Set(
       this.result.trainingSteps.slice(0, this.visibleStepCount).map((step) => step.nodeId)
     );
 
     if (!visibleNodeIds.has(node.id)) {
+      if (preview?.step.nodeId === node.id) {
+        const branchRows = splitRows(rows, preview.candidate.condition);
+
+        return `
+          <section class="trained-tree-node">
+            ${
+              branchLabel
+                ? `<p class="branch-label trained-branch-label">${branchLabel}</p>`
+                : ""
+            }
+            <div class="trained-split-card is-preview ${preview.isBestSelection ? "is-selected-best" : ""}">
+              <p class="metric-label">${preview.isBestSelection ? messages.trainedLesson.selectedRule : messages.trainedLesson.previewRule}</p>
+              <h3>${formatCondition(preview.candidate.condition, this.locale)}</h3>
+            </div>
+            <div class="trained-branch-grid">
+              <div class="trained-branch">
+                ${this.renderPendingGroup(branchRows.trueRows, messages.trainedLesson.trueBranch)}
+              </div>
+              <div class="trained-branch">
+                ${this.renderPendingGroup(branchRows.falseRows, messages.trainedLesson.falseBranch)}
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
       return this.renderPendingGroup(rows, branchLabel);
     }
 
@@ -452,8 +660,8 @@ class TrainedTreeLesson extends HTMLElement {
     }
 
     const label = translateClassLabel(this.result.prediction.predictedLabel, this.locale);
-    const leaves = collectLeaves(this.result.tree);
     const isFinalStep = this.visibleStepCount >= this.result.trainingSteps.length;
+    const preview = this.getActivePreview();
     const treeRows = isFinalStep ? this.rows : getKnownRows(this.rows);
     const targetRows = getTargetRows(this.rows);
 
@@ -473,7 +681,7 @@ class TrainedTreeLesson extends HTMLElement {
 
           <div class="trained-tree-shell">
             ${
-              this.visibleStepCount === 0
+              this.visibleStepCount === 0 && !preview
                 ? this.renderPendingGroup(this.rows)
                 : `
                   ${
@@ -484,24 +692,6 @@ class TrainedTreeLesson extends HTMLElement {
                   ${this.renderTreeNode(this.result.tree, "", treeRows)}
                 `
             }
-          </div>
-
-          <div class="result-metric-grid trained-evaluation-grid">
-            <div class="metric-card">
-              <p class="metric-label">${messages.evaluation.correctRows}</p>
-              <p class="metric-value">${this.result.evaluation.correctRows.length}</p>
-              <p class="metric-baseline">${this.result.evaluation.correctRows.join(", ")}</p>
-            </div>
-            <div class="metric-card">
-              <p class="metric-label">${messages.evaluation.incorrectRows}</p>
-              <p class="metric-value">${this.result.evaluation.incorrectRows.length}</p>
-              <p class="metric-baseline">${this.result.evaluation.incorrectRows.join(", ") || messages.common.none}</p>
-            </div>
-            <div class="metric-card">
-              <p class="metric-label">${messages.trainedLesson.leaves}</p>
-              <p class="metric-value">${leaves.length}</p>
-              <p class="metric-baseline">${messages.trainedLesson.depthLimit(this.result.maxDepth)}</p>
-            </div>
           </div>
         </div>
       </section>
@@ -525,7 +715,7 @@ class TrainedTreeLesson extends HTMLElement {
     const messages = getMessages(this.locale);
 
     this.innerHTML = `
-      <div class="page-shell">
+      <div class="page-shell trained-page-shell">
         <header class="hero">
           <div class="hero-head">
             <div class="hero-title-block">
